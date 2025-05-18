@@ -50,15 +50,10 @@ This function should only modify configuration layer settings."
      markdown
      multiple-cursors
 
-     (select-enable-clipboard nil)
-
-     (require 'simpleclip)
-     (simpleclip-mode 1)
-     (setq simpleclip-unmark-on-copy t)
      (org :variables
           ;; org-enable-modern-support t
-          org-enable-roam-support t
-          org-enable-roam-ui t
+          ;; org-enable-roam-support t
+          ;; org-enable-roam-ui t
           org-startup-indented t
           org-indent-mode t
           org-hide-emphasis-markers t
