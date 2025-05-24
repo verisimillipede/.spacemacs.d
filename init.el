@@ -32,7 +32,7 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(javascript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
@@ -43,7 +43,7 @@ This function should only modify configuration layer settings."
      better-defaults
      emacs-lisp
 
-     ;; git
+     git
      helm
      lsp
      ;; nixos-packages
@@ -61,8 +61,8 @@ This function should only modify configuration layer settings."
           org-pretty-entities t
           org-enable-roam-protocol t
           org-enable-valign t
-          org-enable-appear-support t
           org-enable-transclusion-support t
+          org-want-todo-bindings t
           org-enable-org-journal-support t)
      ;; (shell :variables
      ;;        shell-default-height 30
@@ -293,7 +293,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil then the last auto saved layouts are resumed automatically upon
    ;; start. (default nil)
-   dotspacemacs-auto-resume-layouts nil
+   dotspacemacs-auto-resume-layouts t
 
    ;; If non-nil, auto-generate layout name when creating new layouts. Only has
    ;; effect when using the "jump to layout by number" commands. (default nil)
@@ -362,7 +362,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
-   dotspacemacs-fullscreen-at-startup nil
+   dotspacemacs-fullscreen-at-startup t
 
    ;; If non-nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
    ;; Use to disable fullscreen animations in OSX. (default nil)
@@ -459,7 +459,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil, start an Emacs server if one is not already running.
    ;; (default nil)
-   dotspacemacs-enable-server nil
+   dotspacemacs-enable-server t
 
    ;; Set the emacs server socket location.
    ;; If nil, uses whatever the Emacs default is, otherwise a directory path
@@ -588,6 +588,12 @@ before packages are loaded."
   (require 'simpleclip)
   (simpleclip-mode 1)
 
+  ;; Highlights
+  (define-key evil-normal-state-map (kbd ", h c") 'highlight-changes-mode)
+  (define-key evil-normal-state-map (kbd ", h p") 'highlight-phrase)
+  (define-key evil-normal-state-map (kbd ", h l") 'highlight-lines-matching-regexp)
+  (define-key evil-normal-state-map (kbd ", h u") 'unhighlight-regexp)
+
   ;; j and k should behave like gj and gk
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
@@ -618,53 +624,48 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(org-agenda-files
-     '("/home/mike/Documents/Org/Tasks.org" "/home/mike/Documents/journal/20250517"
+     '("/home/mike/Documents/journal/20250517" "/home/mike/Documents/Org/Tasks.org"
        "/home/mike/Documents/Org/Emacs.org"))
    '(package-selected-packages
-     '(ace-jump-helm-line ace-link aggressive-indent alert all-the-icons auto-compile
-                          auto-highlight-symbol auto-yasnippet
-                          centered-cursor-mode clean-aindent-mode
-                          column-enforce-mode company define-word devdocs diminish
-                          dired-quick-sort disable-mouse dotenv-mode drag-stuff
-                          dumb-jump edit-indirect elisp-def elisp-demos
-                          elisp-slime-nav emacsql emr eval-sexp-fu evil-anzu
-                          evil-args evil-cleverparens evil-collection
-                          evil-easymotion evil-escape evil-evilified-state
-                          evil-exchange evil-goggles evil-iedit-state
-                          evil-indent-plus evil-lion evil-lisp-state evil-matchit
-                          evil-mc evil-nerd-commenter evil-numbers evil-org
-                          evil-surround evil-textobj-line evil-tutor
-                          evil-unimpaired evil-visual-mark-mode evil-visualstar
-                          expand-region eyebrowse fancy-battery flycheck
-                          flycheck-elsa flycheck-package flycheck-pos-tip
-                          flyspell-correct flyspell-correct-helm gh-md gntp
-                          gnuplot golden-ratio google-translate helm-ag
-                          helm-c-yasnippet helm-comint helm-company helm-descbinds
-                          helm-lsp helm-make helm-mode-manager helm-org
-                          helm-org-rifle helm-projectile helm-purpose helm-swoop
-                          helm-themes helm-xref hide-comnt highlight-indentation
-                          highlight-numbers highlight-parentheses hl-todo
-                          holy-mode htmlize hungry-delete hybrid-mode indent-guide
-                          info+ inspector link-hint llama log4e lorem-ipsum
-                          lsp-mode lsp-origami lsp-treemacs lsp-ui macrostep
-                          magit-section markdown-mode markdown-toc multi-line mwim
-                          nameless nerd-icons open-junk-file org-appear
-                          org-category-capture org-cliplink org-contrib
-                          org-download org-journal org-mime org-modern
-                          org-pomodoro org-present org-project-capture
-                          org-projectile org-rich-yank org-roam org-roam-ui
-                          org-superstar org-transclusion origami overseer
-                          package-lint paradox password-generator pcre2el popwin
-                          pos-tip quickrun rainbow-delimiters restart-emacs
-                          simple-httpd simpleclip space-doc spaceline
-                          spacemacs-purpose-popwin spacemacs-whitespace-cleanup
-                          string-edit-at-point string-inflection symbol-overlay
-                          symon term-cursor toc-org treemacs-evil
-                          treemacs-icons-dired treemacs-persp treemacs-projectile
-                          undo-fu undo-fu-session unfill uuidgen valign
-                          vi-tilde-fringe volatile-highlights vundo websocket
-                          wgrep winum writeroom-mode ws-butler yasnippet
-                          yasnippet-snippets yatemplate)))
+     '(a ace-jump-helm-line ace-link add-node-modules-path aggressive-indent alert
+         all-the-icons auto-compile auto-highlight-symbol auto-yasnippet bui
+         centered-cursor-mode clean-aindent-mode closql code-review
+         column-enforce-mode company dap-mode deferred define-word devdocs
+         diminish dired-quick-sort disable-mouse dotenv-mode drag-stuff dumb-jump
+         edit-indirect elisp-def elisp-demos elisp-slime-nav emacsql emojify emr
+         eval-sexp-fu evil-anzu evil-args evil-cleverparens evil-collection
+         evil-easymotion evil-escape evil-evilified-state evil-exchange
+         evil-goggles evil-iedit-state evil-indent-plus evil-lion evil-lisp-state
+         evil-matchit evil-mc evil-nerd-commenter evil-numbers evil-org
+         evil-surround evil-textobj-line evil-tutor evil-unimpaired
+         evil-visual-mark-mode evil-visualstar expand-region eyebrowse
+         fancy-battery flycheck flycheck-elsa flycheck-package flycheck-pos-tip
+         flyspell-correct flyspell-correct-helm forge ggtags gh-md ghub git-link
+         git-messenger git-modes git-timemachine gitignore-templates gntp gnuplot
+         golden-ratio google-translate grizzl helm-ag helm-c-yasnippet helm-comint
+         helm-company helm-descbinds helm-git-grep helm-ls-git helm-lsp helm-make
+         helm-mode-manager helm-org helm-org-rifle helm-projectile helm-purpose
+         helm-swoop helm-themes helm-xref hide-comnt highlight-indentation
+         highlight-numbers highlight-parentheses hl-todo holy-mode htmlize
+         hungry-delete hybrid-mode impatient-mode import-js indent-guide info+
+         inspector js-doc js2-mode js2-refactor link-hint livid-mode llama log4e
+         lorem-ipsum lsp-docker lsp-mode lsp-origami lsp-treemacs lsp-ui macrostep
+         magit magit-section markdown-mode markdown-toc multi-line
+         multiple-cursors mwim nameless nerd-icons nodejs-repl npm-mode
+         open-junk-file org org-appear org-category-capture org-cliplink
+         org-contrib org-download org-journal org-mime org-modern org-pomodoro
+         org-present org-project-capture org-projectile org-rich-yank org-roam
+         org-roam-ui org-superstar org-transclusion orgit orgit-forge origami
+         overseer package-lint paradox password-generator pcre2el popwin pos-tip
+         prettier-js quickrun rainbow-delimiters restart-emacs simple-httpd
+         simpleclip skewer-mode smeargle space-doc spaceline
+         spacemacs-purpose-popwin spacemacs-whitespace-cleanup
+         string-edit-at-point string-inflection symbol-overlay symon term-cursor
+         tern toc-org transient treemacs-evil treemacs-icons-dired treemacs-magit
+         treemacs-persp treemacs-projectile treepy undo-fu undo-fu-session unfill
+         uuidgen valign vi-tilde-fringe volatile-highlights vundo web-beautify
+         websocket wgrep winum with-editor writeroom-mode ws-butler yaml yasnippet
+         yasnippet-snippets yatemplate)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
