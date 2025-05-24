@@ -32,7 +32,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(javascript
+   '(csv
+     javascript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
@@ -470,7 +471,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
 
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
@@ -588,6 +589,16 @@ before packages are loaded."
   (require 'simpleclip)
   (simpleclip-mode 1)
 
+  ;; Configure custom capture templates
+  (setq org-capture-templates
+        `(;; Note the backtick here, it's required so that the defvar based tempaltes will work!
+          ;;http://comments.gmane.org/gmane.emacs.orgmode/106890
+
+          ;; ("t" "To-do" entry (file+headline "~/Documents/Org/Tasks.org" "Tasks")
+          ;;  "** TODO %^{Task Description}\nCreated From: %a\n")
+          ("j" "Journal" entry (file+olp+datetree "~/Documents/Org/journal.org")
+           "* %?\n%U\n" :clock-in t :clock-resume t)
+          ))
   ;; Highlights
   (define-key evil-normal-state-map (kbd ", h c") 'highlight-changes-mode)
   (define-key evil-normal-state-map (kbd ", h p") 'highlight-phrase)
@@ -608,6 +619,42 @@ before packages are loaded."
   (setq org-todo-keywords
         `((sequence "TODO" "NEXT" "STARTED" "WAITING" "HOLD" "|" "DONE" "CANCELED" )
           (type "BUG" "FEATURE" "CHORE" "|" "FIXED" "DROPPED")))
+
+  ;; The rest has been taken from nick anderson.
+  ;; https://github.com/nickanderson/Level-up-your-notes-with-Org/blob/8539fe3119d5345631dc99fe180b6b83090312bf/dot-spacemacs#L269
+
+
+  ;; When hitting alt-return on a header, please create a new one without
+  ;; messing up the one I'm standing on.
+  (setq org-insert-heading-respect-content t)
+
+  ;; Resolve open-clocks if idle more than 30 minutes
+  (setq org-clock-idle-time 30)
+
+                                        ; Enable automatic inline image rendering
+                                        ; http://orgmode.org/manual/In_002dbuffer-settings.html
+  (setq org-startup-with-inline-images t)
+
+  (spacemacs/set-leader-keys
+    "oc" 'org-capture
+    "oa" 'org-agenda)
+
+  ;; This makes sure that each captured entry gets a unique ID
+  ;; (add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
+
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '(
+  ;;    (sh . t)
+  ;;    ))
+
+  ;; AUTOMATICLALLY CREATE IDS for all nodes in org mode file on save. This
+  ;; helps when you use link to an entry and then it is moved to a different
+  ;; file.
+  ;; (add-hook 'org-mode-hook
+  ;;           (lambda ()
+  ;;             (add-hook 'before-save-hook 'my/org-add-ids-to-headlines-in-file nil 'local)))
+
   )
 
 
@@ -630,14 +677,14 @@ This function is called at the very end of Spacemacs initialization."
      '(a ace-jump-helm-line ace-link add-node-modules-path aggressive-indent alert
          all-the-icons auto-compile auto-highlight-symbol auto-yasnippet bui
          centered-cursor-mode clean-aindent-mode closql code-review
-         column-enforce-mode company dap-mode deferred define-word devdocs
-         diminish dired-quick-sort disable-mouse dotenv-mode drag-stuff dumb-jump
-         edit-indirect elisp-def elisp-demos elisp-slime-nav emacsql emojify emr
-         eval-sexp-fu evil-anzu evil-args evil-cleverparens evil-collection
-         evil-easymotion evil-escape evil-evilified-state evil-exchange
-         evil-goggles evil-iedit-state evil-indent-plus evil-lion evil-lisp-state
-         evil-matchit evil-mc evil-nerd-commenter evil-numbers evil-org
-         evil-surround evil-textobj-line evil-tutor evil-unimpaired
+         column-enforce-mode company csv-mode dap-mode deferred define-word
+         devdocs diminish dired-quick-sort disable-mouse dotenv-mode drag-stuff
+         dumb-jump edit-indirect elisp-def elisp-demos elisp-slime-nav emacsql
+         emojify emr eval-sexp-fu evil-anzu evil-args evil-cleverparens
+         evil-collection evil-easymotion evil-escape evil-evilified-state
+         evil-exchange evil-goggles evil-iedit-state evil-indent-plus evil-lion
+         evil-lisp-state evil-matchit evil-mc evil-nerd-commenter evil-numbers
+         evil-org evil-surround evil-textobj-line evil-tutor evil-unimpaired
          evil-visual-mark-mode evil-visualstar expand-region eyebrowse
          fancy-battery flycheck flycheck-elsa flycheck-package flycheck-pos-tip
          flyspell-correct flyspell-correct-helm forge ggtags gh-md ghub git-link
