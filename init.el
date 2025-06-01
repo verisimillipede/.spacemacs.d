@@ -43,6 +43,7 @@ This function should only modify configuration layer settings."
      templates
      better-defaults
      emacs-lisp
+     nixos
 
      git
      helm
@@ -309,7 +310,7 @@ It should only modify the values of Spacemacs settings."
    ;; auto-save the file in-place, `cache' to auto-save the file to another
    ;; file stored in the cache directory and `nil' to disable auto-saving.
    ;; (default 'cache)
-   dotspacemacs-auto-save-file-location 'cache
+   dotspacemacs-auto-save-file-location 'original
 
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
@@ -524,7 +525,7 @@ It should only modify the values of Spacemacs settings."
    ;; which major modes have whitespace cleanup enabled or disabled
    ;; by default.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup `all
+   dotspacemacs-whitespace-cleanup `changed
 
    ;; If non-nil activate `clean-aindent-mode' which tries to correct
    ;; virtual indentation of simple modes. This can interfere with mode specific
@@ -582,24 +583,23 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; (setq org-superstar-headline-bullets-list (?◉ ?○ ?✸ ?✿  ? ))
   (add-hook 'org-mode-hook #'visual-line-mode)
 
   (setq select-enable-clipboard nil)
   (setq simpleclip-unmark-on-copy t)
+  (setq auto-save-visited-mode t)
+  (setq auto-save-visited-interval 20)
   (require 'simpleclip)
   (simpleclip-mode 1)
 
-  ;; Configure custom capture templates
   (setq org-capture-templates
-        `(;; Note the backtick here, it's required so that the defvar based tempaltes will work!
-          ;;http://comments.gmane.org/gmane.emacs.orgmode/106890
-
-          ;; ("t" "To-do" entry (file+headline "~/Documents/Org/Tasks.org" "Tasks")
-          ;;  "** TODO %^{Task Description}\nCreated From: %a\n")
+        '(("t" "Todo items")
+          ("te" "Todo Emacs" entry (file+headline "~/Documents/Org/Tasks.org" "Emacs")
+           "* TODO %^{TITLE}\n %?")
           ("j" "Journal" entry (file+olp+datetree "~/Documents/Org/journal.org")
-           "* %?\n%U\n" :clock-in t :clock-resume t)
-          ))
-  ;; Highlights
+           "* %^{TITLE}\nEntered on %U\n  %i\n  %?")))
+
   (define-key evil-normal-state-map (kbd ", h c") 'highlight-changes-mode)
   (define-key evil-normal-state-map (kbd ", h p") 'highlight-phrase)
   (define-key evil-normal-state-map (kbd ", h l") 'highlight-lines-matching-regexp)
@@ -671,41 +671,41 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(org-agenda-files
-     '("/home/mike/Documents/journal/20250517" "/home/mike/Documents/Org/Tasks.org"
-       "/home/mike/Documents/Org/Emacs.org"))
+     '("/home/mike/Documents/Org/Tasks.org" "/home/mike/Documents/Org/Emacs.org"))
    '(package-selected-packages
      '(a ace-jump-helm-line ace-link add-node-modules-path aggressive-indent alert
          all-the-icons auto-compile auto-highlight-symbol auto-yasnippet bui
          centered-cursor-mode clean-aindent-mode closql code-review
-         column-enforce-mode company csv-mode dap-mode deferred define-word
-         devdocs diminish dired-quick-sort disable-mouse dotenv-mode drag-stuff
-         dumb-jump edit-indirect elisp-def elisp-demos elisp-slime-nav emacsql
-         emojify emr eval-sexp-fu evil-anzu evil-args evil-cleverparens
-         evil-collection evil-easymotion evil-escape evil-evilified-state
-         evil-exchange evil-goggles evil-iedit-state evil-indent-plus evil-lion
-         evil-lisp-state evil-matchit evil-mc evil-nerd-commenter evil-numbers
-         evil-org evil-surround evil-textobj-line evil-tutor evil-unimpaired
-         evil-visual-mark-mode evil-visualstar expand-region eyebrowse
-         fancy-battery flycheck flycheck-elsa flycheck-package flycheck-pos-tip
-         flyspell-correct flyspell-correct-helm forge ggtags gh-md ghub git-link
-         git-messenger git-modes git-timemachine gitignore-templates gntp gnuplot
-         golden-ratio google-translate grizzl helm-ag helm-c-yasnippet helm-comint
-         helm-company helm-descbinds helm-git-grep helm-ls-git helm-lsp helm-make
-         helm-mode-manager helm-org helm-org-rifle helm-projectile helm-purpose
+         column-enforce-mode company company-nixos-options csv-mode dap-mode
+         deferred define-word devdocs diminish dired-quick-sort disable-mouse
+         dotenv-mode drag-stuff dumb-jump edit-indirect elisp-def elisp-demos
+         elisp-slime-nav emacsql emojify emr eval-sexp-fu evil-anzu evil-args
+         evil-cleverparens evil-collection evil-easymotion evil-escape
+         evil-evilified-state evil-exchange evil-goggles evil-iedit-state
+         evil-indent-plus evil-lion evil-lisp-state evil-matchit evil-mc
+         evil-nerd-commenter evil-numbers evil-org evil-surround evil-textobj-line
+         evil-tutor evil-unimpaired evil-visual-mark-mode evil-visualstar
+         expand-region eyebrowse fancy-battery flycheck flycheck-elsa
+         flycheck-package flycheck-pos-tip flyspell-correct flyspell-correct-helm
+         forge ggtags gh-md ghub git-link git-messenger git-modes git-timemachine
+         gitignore-templates gntp gnuplot golden-ratio google-translate grizzl
+         helm-ag helm-c-yasnippet helm-comint helm-company helm-descbinds
+         helm-git-grep helm-ls-git helm-lsp helm-make helm-mode-manager
+         helm-nixos-options helm-org helm-org-rifle helm-projectile helm-purpose
          helm-swoop helm-themes helm-xref hide-comnt highlight-indentation
          highlight-numbers highlight-parentheses hl-todo holy-mode htmlize
          hungry-delete hybrid-mode impatient-mode import-js indent-guide info+
          inspector js-doc js2-mode js2-refactor link-hint livid-mode llama log4e
          lorem-ipsum lsp-docker lsp-mode lsp-origami lsp-treemacs lsp-ui macrostep
          magit magit-section markdown-mode markdown-toc multi-line
-         multiple-cursors mwim nameless nerd-icons nodejs-repl npm-mode
-         open-junk-file org org-appear org-category-capture org-cliplink
-         org-contrib org-download org-journal org-mime org-modern org-pomodoro
-         org-present org-project-capture org-projectile org-rich-yank org-roam
-         org-roam-ui org-superstar org-transclusion orgit orgit-forge origami
-         overseer package-lint paradox password-generator pcre2el popwin pos-tip
-         prettier-js quickrun rainbow-delimiters restart-emacs simple-httpd
-         simpleclip skewer-mode smeargle space-doc spaceline
+         multiple-cursors mwim nameless nerd-icons nix-mode nixos-options
+         nodejs-repl npm-mode open-junk-file org org-appear org-category-capture
+         org-cliplink org-contrib org-download org-journal org-mime org-modern
+         org-pomodoro org-present org-project-capture org-projectile org-rich-yank
+         org-roam org-roam-ui org-superstar org-transclusion orgit orgit-forge
+         origami overseer package-lint paradox password-generator pcre2el popwin
+         pos-tip prettier-js quickrun rainbow-delimiters restart-emacs
+         simple-httpd simpleclip skewer-mode smeargle space-doc spaceline
          spacemacs-purpose-popwin spacemacs-whitespace-cleanup
          string-edit-at-point string-inflection symbol-overlay symon term-cursor
          tern toc-org transient treemacs-evil treemacs-icons-dired treemacs-magit
