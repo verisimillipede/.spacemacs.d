@@ -44,6 +44,7 @@ This function should only modify configuration layer settings."
      better-defaults
      emacs-lisp
      nixos
+     compleseus
 
      git
      helm
@@ -64,7 +65,6 @@ This function should only modify configuration layer settings."
           org-enable-roam-protocol t
           org-enable-valign t
           org-enable-transclusion-support t
-          org-want-todo-bindings t
           org-enable-org-journal-support t)
      ;; (shell :variables
      ;;        shell-default-height 30
@@ -83,7 +83,9 @@ This function should only modify configuration layer settings."
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages '
-   (simpleclip)
+   (simpleclip
+    org-super-agenda
+    consult)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -592,13 +594,25 @@ before packages are loaded."
   (setq auto-save-visited-interval 20)
   (require 'simpleclip)
   (simpleclip-mode 1)
+  (add-hook 'org-capture-mode-hook 'evil-insert-state)
 
   (setq org-capture-templates
-        '(("t" "Todo items")
-          ("te" "Todo Emacs" entry (file+headline "~/Documents/Org/Tasks.org" "Emacs")
-           "* TODO %^{TITLE}\n %?")
+        '(("e" "Emacs")
+          ("et" "Tasks" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Emacs" "Tasks")
+           "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
+          ("eq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Emacs" "Notes" "Questions")
+           "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
+          ("i" "Inbox" entry (file+heading "~/Documents/Org/Notes.org" "Inbox")
+           "* %?\n:Created: %T" :prepend t)
+          ("s" "Stuff")
+          ("sw" "Stuff I Want" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff I Want")
+           "+ %?\n:Created: %T" :prepend t)
+          ("sb" "Stuff to Buy" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff to Buy")
+           "+ %?\n:Created: %T" :prepend t)
+          ("b" "Birds" entry (file+olp "~/Documents/Org/Notes.org" "Life" "Photography" "Birds")
+           "* %?" :prepend t)
           ("j" "Journal" entry (file+olp+datetree "~/Documents/Org/journal.org")
-           "* %^{TITLE}\nEntered on %U\n  %i\n  %?")))
+           "*  %?\nEntered on %U\n\n")))
 
   (define-key evil-normal-state-map (kbd ", h c") 'highlight-changes-mode)
   (define-key evil-normal-state-map (kbd ", h p") 'highlight-phrase)
@@ -608,18 +622,37 @@ before packages are loaded."
   ;; j and k should behave like gj and gk
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+  (define-key evil-normal-state-map (kbd "gh") 'evil-previous-visual-line)
   ;; Also in visual mode
   (define-key evil-visual-state-map "j" 'evil-next-visual-line)
   (define-key evil-visual-state-map "k" 'evil-previous-visual-line)
 
   ;; H and L will bring you to the beginning or end of the line
-  (define-key evil-normal-state-map (kbd "H") `beginning-of-visual-line)
-  (define-key evil-normal-state-map (kbd "L") `end-of-visual-line)
+  (define-key evil-normal-state-map (kbd "H") `evil-first-non-blank-of-visual-line)
+  (define-key evil-normal-state-map (kbd "L") `evil-last-non-blank)
 
   (setq org-todo-keywords
-        `((sequence "TODO" "NEXT" "STARTED" "WAITING" "HOLD" "|" "DONE" "CANCELED" )
-          (type "BUG" "FEATURE" "CHORE" "|" "FIXED" "DROPPED")))
+        `((sequence "TODO(t!)" "PLANNING(!)" "IN-PROGRESS(!)" "WAITING(!)" "HOLD(@/!)" "|" "DONE(!)" "CANCELED(@/!)" )))
+  (setq org-use-fast-todo-selection t)
 
+
+  (setq org-priority-highest ?A
+        org-priority-default ?C
+        org-priority-lowest ?D)
+  (setq org-priority-faces '((?A :foreground "SteelBlue" :weight bold)
+                             (?B :foreground "SteelBlue" :weight bold)
+                             (?C :foreground "SteelBlue" :weight bold)
+                             (?D :foreground "SteelBlue" :weight bold)))
+  (setq org-todo-keyword-faces
+        '(
+          ("TODO" . (:foreground "Gold" :weight bold))
+          ("PLANNING" . (:foreground "PaleGreen" :weight bold))
+          ("IN-PROGRESS" . (:foreground "MediumPurple2" :weight bold))
+          ("WAITING" . (:foreground "DarkOrange" :weight bold))
+          ("HOLD" . (:foreground "Red" :weight bold))
+          ("DONE" . (:foreground "LimeGreen" :weight bold))
+          ("CANCELED" . (:foreground "LimeGreen" :weight bold))
+          ))
   ;; The rest has been taken from nick anderson.
   ;; https://github.com/nickanderson/Level-up-your-notes-with-Org/blob/8539fe3119d5345631dc99fe180b6b83090312bf/dot-spacemacs#L269
 
@@ -637,7 +670,11 @@ before packages are loaded."
 
   (spacemacs/set-leader-keys
     "oc" 'org-capture
-    "oa" 'org-agenda)
+    "oa" 'org-agenda
+    "osl" 'org-store-link
+    "oil" 'org-insert-last-stored-link
+    "on" 'bookmark-jump
+    "oh" 'consult-org-heading)
 
   ;; This makes sure that each captured entry gets a unique ID
   ;; (add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
@@ -670,17 +707,16 @@ This function is called at the very end of Spacemacs initialization."
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(org-agenda-files
-     '("/home/mike/Documents/Org/Tasks.org" "/home/mike/Documents/Org/Emacs.org"))
+   '(org-agenda-files '("~/Documents/Org/Notes.org"))
    '(package-selected-packages
      '(a ace-jump-helm-line ace-link add-node-modules-path aggressive-indent alert
          all-the-icons auto-compile auto-highlight-symbol auto-yasnippet bui
          centered-cursor-mode clean-aindent-mode closql code-review
-         column-enforce-mode company company-nixos-options csv-mode dap-mode
-         deferred define-word devdocs diminish dired-quick-sort disable-mouse
-         dotenv-mode drag-stuff dumb-jump edit-indirect elisp-def elisp-demos
-         elisp-slime-nav emacsql emojify emr eval-sexp-fu evil-anzu evil-args
-         evil-cleverparens evil-collection evil-easymotion evil-escape
+         column-enforce-mode company company-nixos-options consult consult-lsp
+         csv-mode dap-mode deferred define-word devdocs diminish dired-quick-sort
+         disable-mouse dotenv-mode drag-stuff dumb-jump edit-indirect elisp-def
+         elisp-demos elisp-slime-nav emacsql emojify emr eval-sexp-fu evil-anzu
+         evil-args evil-cleverparens evil-collection evil-easymotion evil-escape
          evil-evilified-state evil-exchange evil-goggles evil-iedit-state
          evil-indent-plus evil-lion evil-lisp-state evil-matchit evil-mc
          evil-nerd-commenter evil-numbers evil-org evil-surround evil-textobj-line
@@ -702,16 +738,17 @@ This function is called at the very end of Spacemacs initialization."
          nodejs-repl npm-mode open-junk-file org org-appear org-category-capture
          org-cliplink org-contrib org-download org-journal org-mime org-modern
          org-pomodoro org-present org-project-capture org-projectile org-rich-yank
-         org-roam org-roam-ui org-superstar org-transclusion orgit orgit-forge
-         origami overseer package-lint paradox password-generator pcre2el popwin
-         pos-tip prettier-js quickrun rainbow-delimiters restart-emacs
-         simple-httpd simpleclip skewer-mode smeargle space-doc spaceline
-         spacemacs-purpose-popwin spacemacs-whitespace-cleanup
-         string-edit-at-point string-inflection symbol-overlay symon term-cursor
-         tern toc-org transient treemacs-evil treemacs-icons-dired treemacs-magit
-         treemacs-persp treemacs-projectile treepy undo-fu undo-fu-session unfill
-         uuidgen valign vi-tilde-fringe volatile-highlights vundo web-beautify
-         websocket wgrep winum with-editor writeroom-mode ws-butler yaml yasnippet
+         org-roam org-roam-ui org-super-agenda org-superstar org-transclusion
+         orgit orgit-forge origami overseer package-lint paradox
+         password-generator pcre2el popwin pos-tip prettier-js quickrun
+         rainbow-delimiters restart-emacs simple-httpd simpleclip skewer-mode
+         smeargle space-doc spaceline spacemacs-purpose-popwin
+         spacemacs-whitespace-cleanup string-edit-at-point string-inflection
+         symbol-overlay symon term-cursor tern toc-org transient treemacs-evil
+         treemacs-icons-dired treemacs-magit treemacs-persp treemacs-projectile
+         treepy ts undo-fu undo-fu-session undo-tree unfill uuidgen valign
+         vi-tilde-fringe volatile-highlights vundo web-beautify websocket wgrep
+         winum with-editor writeroom-mode ws-butler yaml yasnippet
          yasnippet-snippets yatemplate)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
