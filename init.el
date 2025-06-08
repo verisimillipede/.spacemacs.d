@@ -32,7 +32,9 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(csv
+   '(html
+     python
+     csv
      javascript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
@@ -595,6 +597,7 @@ before packages are loaded."
   (setq simpleclip-unmark-on-copy t)
   (setq auto-save-visited-mode t)
   (setq auto-save-visited-interval 20)
+  (setq auto-save-interval 20)
   (require 'simpleclip)
   (simpleclip-mode 1)
   (add-hook 'org-capture-mode-hook 'evil-insert-state)
@@ -670,7 +673,7 @@ before packages are loaded."
                                         ; Enable automatic inline image rendering
                                         ; http://orgmode.org/manual/In_002dbuffer-settings.html
   (setq org-startup-with-inline-images t)
-
+  (setq projectile-project-search-path '("~/Code/"))
   (spacemacs/set-leader-keys
     "oc" 'org-capture
     "oa" 'org-agenda
@@ -710,16 +713,19 @@ This function is called at the very end of Spacemacs initialization."
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(org-agenda-files '("~/Documents/Org/Notes.org"))
+   '(org-agenda-files
+     '("/home/mike/Documents/Org/Tasks.org" "/home/mike/Documents/Org/Emacs.org"))
    '(package-selected-packages
      '(a ace-jump-helm-line ace-link add-node-modules-path aggressive-indent alert
-         all-the-icons auto-compile auto-highlight-symbol auto-yasnippet bui
-         centered-cursor-mode clean-aindent-mode closql code-review
-         column-enforce-mode company company-nixos-options consult consult-lsp
-         csv-mode dap-mode deferred define-word devdocs diminish dired-quick-sort
-         disable-mouse dotenv-mode drag-stuff dumb-jump edit-indirect elisp-def
-         elisp-demos elisp-slime-nav emacsql emojify emr eval-sexp-fu evil-anzu
-         evil-args evil-cleverparens evil-collection evil-easymotion evil-escape
+         all-the-icons anaconda-mode auto-compile auto-highlight-symbol
+         auto-yasnippet blacken bui centered-cursor-mode clean-aindent-mode closql
+         code-cells code-review column-enforce-mode company company-anaconda
+         company-nixos-options company-web concurrent consult counsel counsel-css
+         csv-mode ctable cython-mode dap-mode deferred define-word devdocs
+         diminish dired-quick-sort direnv disable-mouse djangonaut dotenv-mode
+         drag-stuff dumb-jump edit-indirect elisp-def elisp-demos elisp-slime-nav
+         emacsql emmet-mode emojify emr epc eval-sexp-fu evil-anzu evil-args
+         evil-cleverparens evil-collection evil-easymotion evil-escape
          evil-evilified-state evil-exchange evil-goggles evil-iedit-state
          evil-indent-plus evil-lion evil-lisp-state evil-matchit evil-mc
          evil-nerd-commenter evil-numbers evil-org evil-surround evil-textobj-line
@@ -728,35 +734,48 @@ This function is called at the very end of Spacemacs initialization."
          flycheck-package flycheck-pos-tip flyspell-correct flyspell-correct-helm
          forge ggtags gh-md ghub git-link git-messenger git-modes git-timemachine
          gitignore-templates gntp gnuplot golden-ratio google-translate grizzl
-         helm-ag helm-c-yasnippet helm-comint helm-company helm-descbinds
-         helm-git-grep helm-ls-git helm-lsp helm-make helm-mode-manager
-         helm-nixos-options helm-org helm-org-rifle helm-projectile helm-purpose
-         helm-swoop helm-themes helm-xref hide-comnt highlight-indentation
-         highlight-numbers highlight-parentheses hl-todo holy-mode htmlize
-         hungry-delete hybrid-mode impatient-mode import-js indent-guide info+
-         inspector js-doc js2-mode js2-refactor link-hint livid-mode llama log4e
-         lorem-ipsum lsp-docker lsp-mode lsp-origami lsp-treemacs lsp-ui macrostep
-         magit magit-section markdown-mode markdown-toc multi-line
-         multiple-cursors mwim nameless nerd-icons nix-mode nixos-options
-         nodejs-repl npm-mode open-junk-file org org-appear org-category-capture
-         org-cliplink org-contrib org-download org-journal org-mime org-modern
-         org-pomodoro org-present org-project-capture org-projectile org-rich-yank
-         org-roam org-roam-ui org-super-agenda org-superstar org-transclusion
-         orgit orgit-forge origami overseer package-lint paradox
-         password-generator pcre2el popwin pos-tip prettier-js quickrun
-         rainbow-delimiters restart-emacs simple-httpd simpleclip skewer-mode
-         smeargle space-doc spaceline spacemacs-purpose-popwin
-         spacemacs-whitespace-cleanup string-edit-at-point string-inflection
-         symbol-overlay symon term-cursor tern toc-org transient treemacs-evil
+         haml-mode helm-ag helm-c-yasnippet helm-comint helm-company helm-cscope
+         helm-css-scss helm-descbinds helm-git-grep helm-ls-git helm-lsp helm-make
+         helm-mode-manager helm-nixos-options helm-org helm-org-rifle
+         helm-projectile helm-purpose helm-pydoc helm-swoop helm-themes helm-xref
+         hide-comnt highlight-indentation highlight-numbers highlight-parentheses
+         hl-todo holy-mode htmlize hungry-delete hybrid-mode impatient-mode
+         import-js importmagic indent-guide info+ inspector ivy js-doc js2-mode
+         js2-refactor link-hint live-py-mode livid-mode llama load-env-vars log4e
+         lorem-ipsum lsp-docker lsp-mode lsp-origami lsp-pyright lsp-treemacs
+         lsp-ui macrostep magit magit-section markdown-mode markdown-toc
+         multi-line multiple-cursors mwim nameless nerd-icons nix-mode
+         nixos-options nodejs-repl nose npm-mode open-junk-file org org-appear
+         org-category-capture org-cliplink org-contrib org-download org-journal
+         org-mime org-modern org-pomodoro org-present org-project-capture
+         org-projectile org-rich-yank org-roam org-roam-ui org-super-agenda
+         org-superstar org-transclusion orgit orgit-forge origami overseer
+         package-lint paradox password-generator pcre2el pet pip-requirements
+         pipenv pippel poetry popwin pos-tip prettier-js pug-mode py-isort pydoc
+         pyenv-mode pylookup pytest pythonic pyvenv quickrun rainbow-delimiters
+         reformatter restart-emacs ruff-format sass-mode scss-mode simple-httpd
+         simpleclip skewer-mode slim-mode smeargle space-doc spaceline
+         spacemacs-purpose-popwin spacemacs-whitespace-cleanup sphinx-doc
+         string-edit-at-point string-inflection swiper symbol-overlay symon
+         tagedit term-cursor tern toc-org transient treemacs-evil
          treemacs-icons-dired treemacs-magit treemacs-persp treemacs-projectile
-         treepy ts undo-fu undo-fu-session undo-tree unfill uniline uuidgen valign
-         vi-tilde-fringe volatile-highlights vundo web-beautify websocket wgrep
-         winum with-editor writeroom-mode ws-butler yaml yasnippet
+         treepy ts undo-fu undo-fu-session unfill uniline uuidgen valign
+         vi-tilde-fringe volatile-highlights vundo web-beautify
+         web-completion-data web-mode websocket wgrep winum with-editor
+         writeroom-mode ws-butler xah-fly-keys xcscope yaml yapfify yasnippet
          yasnippet-snippets yatemplate)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   )
+   '(org-code ((t (:foreground "dark salmon"))))
+   '(org-inline-src-block ((t (:inherit nil))))
+   '(org-level-10 ((t (:extend nil :foreground "Purple" :weight normal))))
+   '(org-level-5 ((t (:extend nil :foreground "tomato" :weight normal))))
+   '(org-level-6 ((t (:extend nil :foreground "cadet blue" :weight normal))))
+   '(org-level-7 ((t (:extend nil :foreground "dark cyan" :weight normal))))
+   '(org-level-8 ((t (:extend nil :foreground "PaleGreen1" :weight normal))))
+   '(org-level-9 ((t (:extend nil :foreground "Pink" :weight normal))))
+   '(org-verbatim ((t (:foreground "orange")))))
   )
