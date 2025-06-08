@@ -585,7 +585,10 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  ;; (setq org-superstar-headline-bullets-list (?◉ ?○ ?✸ ?✿  ? ))
+  ;; (setq org-superstar-headline-bullets-list '(?◉ ?○ ?✸ ?✿ ?  ? ?  ))
+  ;; (setq org-superstar-headline-bullets-list '("\u263a" "\u2622" "\u2622" "\u2622" "\u269b" "\u262f" "\u26e6" "\u2620"  "\u2732" "\u2731" "\u273b" "\u273c" "\u2725" "\u273f" "\u2740" "\u2741" "\u2742" "\u2743" "\u2744" "\u2745" "\u2746" "\u2747"))
+  ;; (setq org-superstar-headline-bullets-list '("\u25c9" "\u25cb" "\u2738" "\u273f" "\u2724" "\u271c" "\u25c6" "\u25b6"))
+  (setq org-superstar-headline-bullets-list '("\u25c9" "\u25cb" "\u25cf" "\u25ce" "\u25c8" "\u25c7" "\u25c6"))
   (add-hook 'org-mode-hook #'visual-line-mode)
 
   (setq select-enable-clipboard nil)
@@ -602,7 +605,7 @@ before packages are loaded."
            "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
           ("eq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Emacs" "Notes" "Questions")
            "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
-          ("i" "Inbox" entry (file+heading "~/Documents/Org/Notes.org" "Inbox")
+          ("i" "Inbox" entry (file+olp "~/Documents/Org/Notes.org" "Inbox")
            "* %?\n:Created: %T" :prepend t)
           ("s" "Stuff")
           ("sw" "Stuff I Want" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff I Want")
@@ -746,7 +749,7 @@ This function is called at the very end of Spacemacs initialization."
          spacemacs-whitespace-cleanup string-edit-at-point string-inflection
          symbol-overlay symon term-cursor tern toc-org transient treemacs-evil
          treemacs-icons-dired treemacs-magit treemacs-persp treemacs-projectile
-         treepy ts undo-fu undo-fu-session undo-tree unfill uuidgen valign
+         treepy ts undo-fu undo-fu-session undo-tree unfill uniline uuidgen valign
          vi-tilde-fringe volatile-highlights vundo web-beautify websocket wgrep
          winum with-editor writeroom-mode ws-butler yaml yasnippet
          yasnippet-snippets yatemplate)))
