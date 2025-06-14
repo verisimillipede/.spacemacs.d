@@ -32,7 +32,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(html
+   '(yaml
+     html
      python
      csv
      javascript
@@ -41,6 +42,7 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     (markdown :variables markdown-live-preview-engine 'vmd)
      auto-completion
      templates
      better-defaults
@@ -50,10 +52,23 @@ This function should only modify configuration layer settings."
 
      git
      helm
-     lsp
      ;; nixos-packages
      markdown
      multiple-cursors
+     pandoc
+     pdf
+     (python :variables
+             python-backend 'lsp
+             python-lsp-server 'pyright
+             ;; python-test-runner 'pytest
+             python-formatter 'ruff
+             python-format-on-save t
+             python-fill-column 88
+             ;; python-auto-set-local-pyvenv-virtualenv nil
+             )
+     ranger
+     neotree
+     xkcd
 
      (org :variables
           ;; org-enable-modern-support t
@@ -86,6 +101,11 @@ This function should only modify configuration layer settings."
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages '
    (simpleclip
+    uniline
+    djangonaut
+    web-mode
+    direnv
+    wiki-summary
     org-super-agenda
     consult)
 
@@ -593,6 +613,14 @@ before packages are loaded."
   (setq org-superstar-headline-bullets-list '("\u25c9" "\u25cb" "\u25cf" "\u25ce" "\u25c8" "\u25c7" "\u25c6"))
   (add-hook 'org-mode-hook #'visual-line-mode)
 
+  (use-package
+    direnv
+    :ensure t
+    :config
+    (direnv-mode)
+    )
+
+
   (setq select-enable-clipboard nil)
   (setq simpleclip-unmark-on-copy t)
   (setq auto-save-visited-mode t)
@@ -713,69 +741,95 @@ This function is called at the very end of Spacemacs initialization."
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(org-agenda-files
-     '("/home/mike/Documents/Org/Tasks.org" "/home/mike/Documents/Org/Emacs.org"))
+   '(company-minimum-prefix-length 1)
+   '(flycheck-checkers
+     '(lsp emacs-lisp-elsa ada-gnat asciidoctor asciidoc awk-gawk
+           bazel-build-buildifier bazel-module-buildifier
+           bazel-starlark-buildifier bazel-workspace-buildifier c/c++-clang
+           c/c++-gcc c/c++-cppcheck cfengine coffee coffee-coffeelint css-csslint
+           css-stylelint cuda-nvcc cwl d-dmd dockerfile-hadolint elixir-credo
+           emacs-lisp emacs-lisp-checkdoc ember-template erlang-rebar3 erlang
+           eruby-erubis eruby-ruumba fortran-gfortran go-gofmt go-vet go-build
+           go-test go-errcheck go-unconvert go-staticcheck groovy haml haml-lint
+           handlebars haskell-stack-ghc haskell-ghc haskell-hlint html-tidy
+           javascript-eslint javascript-jshint javascript-standard json-jsonlint
+           json-python-json json-jq jsonnet less less-stylelint llvm-llc
+           lua-luacheck lua markdown-markdownlint-cli markdown-markdownlint-cli2
+           markdown-mdl markdown-pymarkdown nix nix-linter opam perl
+           perl-perlcritic perl-perlimports php php-phpmd php-phpcs
+           php-phpcs-changed processing proselint protobuf-protoc
+           protobuf-prototool pug puppet-parser puppet-lint python-flake8
+           python-pylint python-pycompile python-pyright python-mypy r-lintr r
+           racket rpm-rpmlint rst-sphinx rst ruby-rubocop ruby-chef-cookstyle
+           ruby-standard ruby-reek ruby ruby-jruby rust-cargo rust rust-clippy
+           salt-lint scala scala-scalastyle scheme-chicken scss-lint
+           sass-stylelint scss-stylelint sass/scss-sass-lint sass scss sh-bash
+           sh-posix-dash sh-posix-bash sh-zsh sh-shellcheck slim slim-lint
+           sql-sqlint statix systemd-analyze tcl-nagelfar terraform
+           terraform-tflint tex-chktex tex-lacheck texinfo textlint
+           typescript-tslint verilog-verilator vhdl-ghdl xml-xmlstarlet
+           xml-xmllint yaml-actionlint yaml-jsyaml yaml-ruby yaml-yamllint
+           emacs-lisp-package))
+   '(org-agenda-files '("~/Documents/Org/Notes.org"))
    '(package-selected-packages
-     '(a ace-jump-helm-line ace-link add-node-modules-path aggressive-indent alert
-         all-the-icons anaconda-mode auto-compile auto-highlight-symbol
-         auto-yasnippet blacken bui centered-cursor-mode clean-aindent-mode closql
-         code-cells code-review column-enforce-mode company company-anaconda
-         company-nixos-options company-web concurrent consult counsel counsel-css
-         csv-mode ctable cython-mode dap-mode deferred define-word devdocs
-         diminish dired-quick-sort direnv disable-mouse djangonaut dotenv-mode
-         drag-stuff dumb-jump edit-indirect elisp-def elisp-demos elisp-slime-nav
-         emacsql emmet-mode emojify emr epc eval-sexp-fu evil-anzu evil-args
-         evil-cleverparens evil-collection evil-easymotion evil-escape
-         evil-evilified-state evil-exchange evil-goggles evil-iedit-state
-         evil-indent-plus evil-lion evil-lisp-state evil-matchit evil-mc
-         evil-nerd-commenter evil-numbers evil-org evil-surround evil-textobj-line
-         evil-tutor evil-unimpaired evil-visual-mark-mode evil-visualstar
-         expand-region eyebrowse fancy-battery flycheck flycheck-elsa
-         flycheck-package flycheck-pos-tip flyspell-correct flyspell-correct-helm
-         forge ggtags gh-md ghub git-link git-messenger git-modes git-timemachine
-         gitignore-templates gntp gnuplot golden-ratio google-translate grizzl
-         haml-mode helm-ag helm-c-yasnippet helm-comint helm-company helm-cscope
-         helm-css-scss helm-descbinds helm-git-grep helm-ls-git helm-lsp helm-make
-         helm-mode-manager helm-nixos-options helm-org helm-org-rifle
-         helm-projectile helm-purpose helm-pydoc helm-swoop helm-themes helm-xref
-         hide-comnt highlight-indentation highlight-numbers highlight-parentheses
-         hl-todo holy-mode htmlize hungry-delete hybrid-mode impatient-mode
-         import-js importmagic indent-guide info+ inspector ivy js-doc js2-mode
-         js2-refactor link-hint live-py-mode livid-mode llama load-env-vars log4e
-         lorem-ipsum lsp-docker lsp-mode lsp-origami lsp-pyright lsp-treemacs
-         lsp-ui macrostep magit magit-section markdown-mode markdown-toc
-         multi-line multiple-cursors mwim nameless nerd-icons nix-mode
-         nixos-options nodejs-repl nose npm-mode open-junk-file org org-appear
-         org-category-capture org-cliplink org-contrib org-download org-journal
-         org-mime org-modern org-pomodoro org-present org-project-capture
-         org-projectile org-rich-yank org-roam org-roam-ui org-super-agenda
-         org-superstar org-transclusion orgit orgit-forge origami overseer
-         package-lint paradox password-generator pcre2el pet pip-requirements
-         pipenv pippel poetry popwin pos-tip prettier-js pug-mode py-isort pydoc
-         pyenv-mode pylookup pytest pythonic pyvenv quickrun rainbow-delimiters
-         reformatter restart-emacs ruff-format sass-mode scss-mode simple-httpd
-         simpleclip skewer-mode slim-mode smeargle space-doc spaceline
-         spacemacs-purpose-popwin spacemacs-whitespace-cleanup sphinx-doc
-         string-edit-at-point string-inflection swiper symbol-overlay symon
-         tagedit term-cursor tern toc-org transient treemacs-evil
-         treemacs-icons-dired treemacs-magit treemacs-persp treemacs-projectile
-         treepy ts undo-fu undo-fu-session unfill uniline uuidgen valign
-         vi-tilde-fringe volatile-highlights vundo web-beautify
-         web-completion-data web-mode websocket wgrep winum with-editor
-         writeroom-mode ws-butler xah-fly-keys xcscope yaml yapfify yasnippet
-         yasnippet-snippets yatemplate)))
+     '(ace-jump-helm-line ace-link aggressive-indent all-the-icons auto-compile
+                          auto-highlight-symbol auto-yasnippet blacken
+                          centered-cursor-mode clean-aindent-mode code-cells
+                          code-review column-enforce-mode company-nixos-options
+                          company-web consult-lsp csv-mode cython-mode define-word
+                          devdocs diminish dired-quick-sort direnv disable-mouse
+                          djangonaut dotenv-mode drag-stuff dumb-jump
+                          edit-indirect elisp-def elisp-demos elisp-slime-nav
+                          emmet-mode emr eval-sexp-fu evil-anzu evil-args
+                          evil-cleverparens evil-collection evil-easymotion
+                          evil-escape evil-evilified-state evil-exchange
+                          evil-goggles evil-iedit-state evil-indent-plus evil-lion
+                          evil-lisp-state evil-matchit evil-mc evil-nerd-commenter
+                          evil-numbers evil-org evil-surround evil-textobj-line
+                          evil-tutor evil-unimpaired evil-visual-mark-mode
+                          evil-visualstar expand-region eyebrowse fancy-battery
+                          flycheck-elsa flycheck-package flycheck-pos-tip
+                          flyspell-correct-helm gh-md git-link git-messenger
+                          git-modes git-timemachine gitignore-templates gnuplot
+                          golden-ratio google-translate helm-ag helm-c-yasnippet
+                          helm-comint helm-company helm-css-scss helm-descbinds
+                          helm-git-grep helm-ls-git helm-lsp helm-make
+                          helm-mode-manager helm-nixos-options helm-org
+                          helm-org-rifle helm-projectile helm-purpose helm-pydoc
+                          helm-swoop helm-themes helm-xref hide-comnt
+                          highlight-indentation highlight-numbers
+                          highlight-parentheses hl-todo holy-mode hungry-delete
+                          hybrid-mode impatient-mode indent-guide info+ inspector
+                          js-doc js2-refactor json-mode json-navigator
+                          json-reformat link-hint live-py-mode livid-mode
+                          lorem-ipsum lsp-mode lsp-origami lsp-pyright
+                          lsp-treemacs lsp-ui macrostep magit-popup markdown-toc
+                          multi-line mwim nameless nix-mode nodejs-repl npm-mode
+                          open-junk-file org-cliplink org-contrib org-download
+                          org-journal org-mime org-pomodoro org-present
+                          org-projectile org-rich-yank org-super-agenda
+                          org-superstar org-transclusion orgit-forge origami
+                          overseer ox-pandoc page-break-lines pandoc-mode paradox
+                          password-generator pcre2el pdf-tools pdf-view-restore
+                          pet pip-requirements pipenv pippel poetry popwin
+                          prettier-js pug-mode py-isort pydoc pyenv-mode pylookup
+                          pytest quickrun rainbow-delimiters ranger reformatter
+                          restart-emacs ruff-format sass-mode scss-mode simpleclip
+                          slim-mode smeargle space-doc spaceline
+                          spacemacs-purpose-popwin spacemacs-whitespace-cleanup
+                          sphinx-doc string-edit-at-point string-inflection
+                          symbol-overlay symon system-packages tablist tagedit
+                          term-cursor tern toc-org treemacs-evil
+                          treemacs-icons-dired treemacs-magit treemacs-persp
+                          treemacs-projectile undo-fu undo-fu-session unfill
+                          uniline valign vi-tilde-fringe vmd-mode
+                          volatile-highlights vundo web-beautify web-mode wgrep
+                          wiki-summary winum writeroom-mode ws-butler xkcd
+                          yaml-mode yasnippet-snippets yatemplate)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(org-code ((t (:foreground "dark salmon"))))
-   '(org-inline-src-block ((t (:inherit nil))))
-   '(org-level-10 ((t (:extend nil :foreground "Purple" :weight normal))))
-   '(org-level-5 ((t (:extend nil :foreground "tomato" :weight normal))))
-   '(org-level-6 ((t (:extend nil :foreground "cadet blue" :weight normal))))
-   '(org-level-7 ((t (:extend nil :foreground "dark cyan" :weight normal))))
-   '(org-level-8 ((t (:extend nil :foreground "PaleGreen1" :weight normal))))
-   '(org-level-9 ((t (:extend nil :foreground "Pink" :weight normal))))
-   '(org-verbatim ((t (:foreground "orange")))))
+   )
   )
