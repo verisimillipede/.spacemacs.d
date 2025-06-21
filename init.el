@@ -31,64 +31,65 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
 
    ;; List of configuration layers to load.
-   dotspacemacs-configuration-layers
-   '(yaml
-     html
-     python
-     csv
-     javascript
-     ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
-     ;; `M-m f e R' (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
-     (markdown :variables markdown-live-preview-engine 'vmd)
-     auto-completion
-     templates
-     better-defaults
-     emacs-lisp
-     nixos
-     compleseus
+   dotspacemacs-configuration-layers '
+   (yaml
+    html
+    python
+    csv
+    javascript
+    ;; ----------------------------------------------------------------
+    ;; Example of useful layers you may want to use right away.
+    ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
+    ;; `M-m f e R' (Emacs style) to install them.
+    ;; ----------------------------------------------------------------
+    (markdown :variables markdown-live-preview-engine 'vmd)
+    auto-completion
+    templates
+    better-defaults
+    emacs-lisp
+    nixos
+    compleseus
+    shell
+    git
+    helm
+    ;; nixos-packages
+    markdown
+    multiple-cursors
+    pandoc
+    pdf
+    lsp
+    (python :variables
+            python-backend 'lsp
+            python-lsp-server 'pyright
+            ;; python-test-runner 'pytest
+            python-formatter 'ruff
+            python-format-on-save t
+            python-fill-column 88
+            ;; python-auto-set-local-pyvenv-virtualenv nil
+            )
+    ranger
+    neotree
+    xkcd
 
-     git
-     helm
-     ;; nixos-packages
-     markdown
-     multiple-cursors
-     pandoc
-     pdf
-     (python :variables
-             python-backend 'lsp
-             python-lsp-server 'pyright
-             ;; python-test-runner 'pytest
-             python-formatter 'ruff
-             python-format-on-save t
-             python-fill-column 88
-             ;; python-auto-set-local-pyvenv-virtualenv nil
-             )
-     ranger
-     neotree
-     xkcd
-
-     (org :variables
-          ;; org-enable-modern-support t
-          ;; org-enable-roam-support t
-          ;; org-enable-roam-ui t
-          org-startup-indented t
-          org-indent-mode t
-          org-hide-emphasis-markers t
-          org-link-descriptive t
-          org-pretty-entities t
-          org-enable-roam-protocol t
-          org-enable-valign t
-          org-enable-transclusion-support t
-          org-enable-org-journal-support t)
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-     spell-checking
-     syntax-checking
-     treemacs)
+    (org :variables
+         ;; org-enable-modern-support t
+         ;; org-enable-roam-support t
+         ;; org-enable-roam-ui t
+         org-startup-indented t
+         org-indent-mode t
+         org-hide-emphasis-markers t
+         org-link-descriptive t
+         org-pretty-entities t
+         org-enable-roam-protocol t
+         org-enable-valign t
+         org-enable-transclusion-support t
+         org-enable-org-journal-support t)
+    ;; (shell :variables
+    ;;        shell-default-height 30
+    ;;        shell-default-position 'bottom)
+    spell-checking
+    syntax-checking
+    treemacs)
 
 
    ;; List of additional packages that will be installed without being wrapped
@@ -104,9 +105,11 @@ This function should only modify configuration layer settings."
     uniline
     djangonaut
     web-mode
+    yasnippet-snippets
     direnv
     wiki-summary
     org-super-agenda
+    eat
     consult)
 
    ;; A list of packages that cannot be updated.
@@ -663,7 +666,7 @@ before packages are loaded."
 
   ;; H and L will bring you to the beginning or end of the line
   (define-key evil-normal-state-map (kbd "H") `evil-first-non-blank-of-visual-line)
-  (define-key evil-normal-state-map (kbd "L") `evil-last-non-blank)
+  (define-key evil-normal-state-map (kbd "L") `evil-end-of-visual-line)
 
   (setq org-todo-keywords
         `((sequence "TODO(t!)" "PLANNING(!)" "IN-PROGRESS(!)" "WAITING(!)" "HOLD(@/!)" "|" "DONE(!)" "CANCELED(@/!)" )))
@@ -778,7 +781,7 @@ This function is called at the very end of Spacemacs initialization."
                           code-review column-enforce-mode company-nixos-options
                           company-web consult-lsp csv-mode cython-mode define-word
                           devdocs diminish dired-quick-sort direnv disable-mouse
-                          djangonaut dotenv-mode drag-stuff dumb-jump
+                          djangonaut dotenv-mode drag-stuff dumb-jump eat
                           edit-indirect elisp-def elisp-demos elisp-slime-nav
                           emmet-mode emr eval-sexp-fu evil-anzu evil-args
                           evil-cleverparens evil-collection evil-easymotion
