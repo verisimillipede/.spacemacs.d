@@ -103,6 +103,7 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages '
    (simpleclip
     uniline
+    vale
     djangonaut
     web-mode
     yasnippet-snippets
@@ -552,7 +553,8 @@ It should only modify the values of Spacemacs settings."
    ;; which major modes have whitespace cleanup enabled or disabled
    ;; by default.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup `changed
+   dotspacemacs-whitespace-cleanup `nil
+
 
    ;; If non-nil activate `clean-aindent-mode' which tries to correct
    ;; virtual indentation of simple modes. This can interfere with mode specific
@@ -639,6 +641,11 @@ before packages are loaded."
            "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
           ("eq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Emacs" "Notes" "Questions")
            "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
+          ("d" "Django")
+          ("dq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Questions About Tools and Concepts")
+           "* %? :django:\n:Created: %T" :prepend t)
+          ("dt" "Tasks" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Tasks")
+           "* TODO %? :django:\n:Created: %T" :prepend t)
           ("i" "Inbox" entry (file+olp "~/Documents/Org/Notes.org" "Inbox")
            "* %?\n:Created: %T" :prepend t)
           ("s" "Stuff")
@@ -665,8 +672,14 @@ before packages are loaded."
   (define-key evil-visual-state-map "k" 'evil-previous-visual-line)
 
   ;; H and L will bring you to the beginning or end of the line
-  (define-key evil-normal-state-map (kbd "H") `evil-first-non-blank-of-visual-line)
-  (define-key evil-normal-state-map (kbd "L") `evil-end-of-visual-line)
+  (define-key evil-normal-state-map (kbd "H") 'evil-first-non-blank-of-visual-line)
+  (define-key evil-normal-state-map (kbd "L") 'evil-last-non-blank)
+
+  ;; Better copy/paste
+  (global-set-key (kbd "C-S-c") 'simpleclip-copy)
+  (global-set-key (kbd "C-S-v") 'simpleclip-paste)
+
+  (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
 
   (setq org-todo-keywords
         `((sequence "TODO(t!)" "PLANNING(!)" "IN-PROGRESS(!)" "WAITING(!)" "HOLD(@/!)" "|" "DONE(!)" "CANCELED(@/!)" )))
@@ -701,8 +714,6 @@ before packages are loaded."
   ;; Resolve open-clocks if idle more than 30 minutes
   (setq org-clock-idle-time 30)
 
-                                        ; Enable automatic inline image rendering
-                                        ; http://orgmode.org/manual/In_002dbuffer-settings.html
   (setq org-startup-with-inline-images t)
   (setq projectile-project-search-path '("~/Code/"))
   (spacemacs/set-leader-keys
@@ -713,14 +724,20 @@ before packages are loaded."
     "on" 'bookmark-jump
     "oh" 'consult-org-heading)
 
+
+  (custom-set-faces
+   '(org-code ((t (:foreground "medium sea green"))))
+   '(org-link ((t (:foreground "medium aquamarine" :underline t))))
+   '(org-verbatim ((t (:foreground "indian red")))))
   ;; This makes sure that each captured entry gets a unique ID
   ;; (add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
 
-  ;; (org-babel-do-load-languages
-  ;;  'org-babel-load-languages
-  ;;  '(
-  ;;    (sh . t)
-  ;;    ))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     ;; (sh . t)
+     (python . t)
+     ))
 
   ;; AUTOMATICLALLY CREATE IDS for all nodes in org mode file on save. This
   ;; helps when you use link to an entry and then it is moved to a different
@@ -744,6 +761,7 @@ This function is called at the very end of Spacemacs initialization."
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
+   '(blink-cursor-mode nil)
    '(company-minimum-prefix-length 1)
    '(flycheck-checkers
      '(lsp emacs-lisp-elsa ada-gnat asciidoctor asciidoc awk-gawk
@@ -773,66 +791,72 @@ This function is called at the very end of Spacemacs initialization."
            typescript-tslint verilog-verilator vhdl-ghdl xml-xmlstarlet
            xml-xmllint yaml-actionlint yaml-jsyaml yaml-ruby yaml-yamllint
            emacs-lisp-package))
+   '(markdown-fontify-code-blocks-natively t)
    '(org-agenda-files '("~/Documents/Org/Notes.org"))
+   '(org-fontify-quote-and-verse-blocks t)
+   '(org-link-translation-function 'toc-org-unhrefify)
    '(package-selected-packages
      '(ace-jump-helm-line ace-link aggressive-indent all-the-icons auto-compile
                           auto-highlight-symbol auto-yasnippet blacken
                           centered-cursor-mode clean-aindent-mode code-cells
                           code-review column-enforce-mode company-nixos-options
-                          company-web consult-lsp csv-mode cython-mode define-word
-                          devdocs diminish dired-quick-sort direnv disable-mouse
-                          djangonaut dotenv-mode drag-stuff dumb-jump eat
-                          edit-indirect elisp-def elisp-demos elisp-slime-nav
-                          emmet-mode emr eval-sexp-fu evil-anzu evil-args
-                          evil-cleverparens evil-collection evil-easymotion
-                          evil-escape evil-evilified-state evil-exchange
-                          evil-goggles evil-iedit-state evil-indent-plus evil-lion
-                          evil-lisp-state evil-matchit evil-mc evil-nerd-commenter
-                          evil-numbers evil-org evil-surround evil-textobj-line
-                          evil-tutor evil-unimpaired evil-visual-mark-mode
-                          evil-visualstar expand-region eyebrowse fancy-battery
-                          flycheck-elsa flycheck-package flycheck-pos-tip
-                          flyspell-correct-helm gh-md git-link git-messenger
-                          git-modes git-timemachine gitignore-templates gnuplot
-                          golden-ratio google-translate helm-ag helm-c-yasnippet
-                          helm-comint helm-company helm-css-scss helm-descbinds
-                          helm-git-grep helm-ls-git helm-lsp helm-make
-                          helm-mode-manager helm-nixos-options helm-org
-                          helm-org-rifle helm-projectile helm-purpose helm-pydoc
-                          helm-swoop helm-themes helm-xref hide-comnt
-                          highlight-indentation highlight-numbers
-                          highlight-parentheses hl-todo holy-mode hungry-delete
-                          hybrid-mode impatient-mode indent-guide info+ inspector
-                          js-doc js2-refactor json-mode json-navigator
-                          json-reformat link-hint live-py-mode livid-mode
-                          lorem-ipsum lsp-mode lsp-origami lsp-pyright
-                          lsp-treemacs lsp-ui macrostep magit-popup markdown-toc
-                          multi-line mwim nameless nix-mode nodejs-repl npm-mode
-                          open-junk-file org-cliplink org-contrib org-download
-                          org-journal org-mime org-pomodoro org-present
-                          org-projectile org-rich-yank org-super-agenda
-                          org-superstar org-transclusion orgit-forge origami
-                          overseer ox-pandoc page-break-lines pandoc-mode paradox
-                          password-generator pcre2el pdf-tools pdf-view-restore
-                          pet pip-requirements pipenv pippel poetry popwin
-                          prettier-js pug-mode py-isort pydoc pyenv-mode pylookup
-                          pytest quickrun rainbow-delimiters ranger reformatter
-                          restart-emacs ruff-format sass-mode scss-mode simpleclip
-                          slim-mode smeargle space-doc spaceline
-                          spacemacs-purpose-popwin spacemacs-whitespace-cleanup
-                          sphinx-doc string-edit-at-point string-inflection
-                          symbol-overlay symon system-packages tablist tagedit
-                          term-cursor tern toc-org treemacs-evil
-                          treemacs-icons-dired treemacs-magit treemacs-persp
-                          treemacs-projectile undo-fu undo-fu-session unfill
-                          uniline valign vi-tilde-fringe vmd-mode
-                          volatile-highlights vundo web-beautify web-mode wgrep
-                          wiki-summary winum writeroom-mode ws-butler xkcd
-                          yaml-mode yasnippet-snippets yatemplate)))
+                          company-web consult-lsp csv-mode cython-mode dap-mode
+                          define-word devdocs diminish dired-quick-sort direnv
+                          disable-mouse djangonaut dotenv-mode drag-stuff
+                          dumb-jump eat edit-indirect elisp-def elisp-demos
+                          elisp-slime-nav emmet-mode emr eval-sexp-fu evil-anzu
+                          evil-args evil-cleverparens evil-collection
+                          evil-easymotion evil-escape evil-evilified-state
+                          evil-exchange evil-goggles evil-iedit-state
+                          evil-indent-plus evil-lion evil-lisp-state evil-matchit
+                          evil-mc evil-nerd-commenter evil-numbers evil-org
+                          evil-surround evil-textobj-line evil-tutor
+                          evil-unimpaired evil-visual-mark-mode evil-visualstar
+                          expand-region eyebrowse fancy-battery flycheck-elsa
+                          flycheck-package flycheck-pos-tip flyspell-correct-helm
+                          gh-md git-link git-messenger git-modes git-timemachine
+                          gitignore-templates gnuplot golden-ratio
+                          google-translate helm-ag helm-c-yasnippet helm-comint
+                          helm-company helm-css-scss helm-descbinds helm-git-grep
+                          helm-ls-git helm-lsp helm-make helm-mode-manager
+                          helm-nixos-options helm-org helm-org-rifle
+                          helm-projectile helm-purpose helm-pydoc helm-swoop
+                          helm-themes helm-xref hide-comnt highlight-indentation
+                          highlight-numbers highlight-parentheses hl-todo
+                          holy-mode hungry-delete hybrid-mode impatient-mode
+                          indent-guide info+ inspector js-doc js2-refactor
+                          json-mode json-navigator json-reformat link-hint
+                          live-py-mode livid-mode lorem-ipsum lsp-mode lsp-origami
+                          lsp-pyright lsp-treemacs lsp-ui macrostep magit-popup
+                          markdown-toc multi-line mwim nameless nix-mode
+                          nodejs-repl npm-mode open-junk-file org-cliplink
+                          org-contrib org-download org-journal org-mime
+                          org-pomodoro org-present org-projectile org-rich-yank
+                          org-super-agenda org-superstar org-transclusion
+                          orgit-forge origami overseer ox-pandoc page-break-lines
+                          pandoc-mode paradox password-generator pcre2el pdf-tools
+                          pdf-view-restore pet pip-requirements pipenv pippel
+                          poetry popwin prettier-js pug-mode py-isort pydoc
+                          pyenv-mode pylookup pytest quickrun rainbow-delimiters
+                          ranger reformatter restart-emacs ruff-format sass-mode
+                          scss-mode simpleclip slim-mode smeargle space-doc
+                          spaceline spacemacs-purpose-popwin
+                          spacemacs-whitespace-cleanup sphinx-doc
+                          string-edit-at-point string-inflection symbol-overlay
+                          symon system-packages tablist tagedit term-cursor tern
+                          toc-org treemacs-evil treemacs-icons-dired
+                          treemacs-magit treemacs-persp treemacs-projectile
+                          undo-fu undo-fu-session unfill uniline valign
+                          vi-tilde-fringe vmd-mode volatile-highlights vundo
+                          web-beautify web-mode wgrep wiki-summary winum
+                          writeroom-mode ws-butler xah-fly-keys xkcd yaml-mode
+                          yasnippet-snippets yatemplate)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   )
+   '(org-code ((t (:foreground "medium sea green"))))
+   '(org-link ((t (:foreground "medium aquamarine" :underline t))))
+   '(org-verbatim ((t (:foreground "indian red")))))
   )
