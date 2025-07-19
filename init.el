@@ -6,6 +6,7 @@
   "Layer configuration:
 This function should only modify configuration layer settings."
   (setq-default
+
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
@@ -323,7 +324,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil then the last auto saved layouts are resumed automatically upon
    ;; start. (default nil)
-   dotspacemacs-auto-resume-layouts t
+   dotspacemacs-auto-resume-layouts nil
 
    ;; If non-nil, auto-generate layout name when creating new layouts. Only has
    ;; effect when using the "jump to layout by number" commands. (default nil)
@@ -679,8 +680,18 @@ before packages are loaded."
   (global-set-key (kbd "C-S-c") 'simpleclip-copy)
   (global-set-key (kbd "C-S-v") 'simpleclip-paste)
 
-  (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
+  (define-key yas-minor-mode-map (kbd "<tab>") yas-maybe-expand)
+  (define-key yas-minor-mode-map (kbd "TAB") yas-maybe-expand)
 
+  (use-package web-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.djhtml?\\'" . web-mode))
+    (setq web-mode-engines-alist
+          '(("django" . "\\.djhtml\\'")))
+    (setq web-mode-ac-sources-alist
+          '(("css" . (ac-source-css-property))
+            ("html" . (ac-source-words-in-buffer ac-source-abbrev)))))
   (setq org-todo-keywords
         `((sequence "TODO(t!)" "PLANNING(!)" "IN-PROGRESS(!)" "WAITING(!)" "HOLD(@/!)" "|" "DONE(!)" "CANCELED(@/!)" )))
   (setq org-use-fast-todo-selection t)
