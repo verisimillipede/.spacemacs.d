@@ -53,6 +53,7 @@ This function should only modify configuration layer settings."
     nixos
     compleseus
     shell
+    latex
 
     git
     helm
@@ -112,8 +113,6 @@ This function should only modify configuration layer settings."
     web-mode
     yasnippet-snippets
     direnv
-    cdlatex
-    auctex
     wiki-summary
     org-super-agenda
     eat
