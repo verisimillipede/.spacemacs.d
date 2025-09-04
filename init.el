@@ -3,7 +3,8 @@
 ;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
-  "Layer configuration:
+  "Layer configu
+ration:
 This function should only modify configuration layer settings."
   (setq-default
 
@@ -33,7 +34,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers '
-   (yaml
+   (lua
+    yaml
     html
     python
     csv
@@ -51,6 +53,7 @@ This function should only modify configuration layer settings."
     nixos
     compleseus
     shell
+
     git
     helm
     ;; nixos-packages
@@ -109,6 +112,8 @@ This function should only modify configuration layer settings."
     web-mode
     yasnippet-snippets
     direnv
+    cdlatex
+    auctex
     wiki-summary
     org-super-agenda
     eat
@@ -677,7 +682,7 @@ before packages are loaded."
   (define-key evil-normal-state-map (kbd "L") 'evil-last-non-blank)
 
   ;; Better copy/paste
-  (global-set-key (kbd "C-S-c") 'simpleclip-copy)
+  (define-key evil-visual-state-map (kbd "SPC y") 'simpleclip-copy)
   (global-set-key (kbd "C-S-v") 'simpleclip-paste)
 
   (define-key yas-minor-mode-map (kbd "<tab>") yas-maybe-expand)
@@ -687,8 +692,9 @@ before packages are loaded."
     :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.djhtml?\\'" . web-mode))
+    (setq web-mode-enable-auto-pairing t)
     (setq web-mode-engines-alist
-          '(("django" . "\\.djhtml\\'")))
+          '(("django" . "\\.html\\'")))
     (setq web-mode-ac-sources-alist
           '(("css" . (ac-source-css-property))
             ("html" . (ac-source-words-in-buffer ac-source-abbrev)))))
@@ -725,8 +731,9 @@ before packages are loaded."
   ;; Resolve open-clocks if idle more than 30 minutes
   (setq org-clock-idle-time 30)
 
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 4))
   (setq org-startup-with-inline-images t)
-  (setq projectile-project-search-path '("~/Code/"))
+  (setq projectile-project-search-path '("~/Code/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
   (spacemacs/set-leader-keys
     "oc" 'org-capture
     "oa" 'org-agenda
@@ -735,6 +742,7 @@ before packages are loaded."
     "on" 'bookmark-jump
     "oh" 'consult-org-heading)
 
+  (setq org-export-with-broken-links t)
 
   (custom-set-faces
    '(org-code ((t (:foreground "medium sea green"))))
@@ -807,25 +815,26 @@ This function is called at the very end of Spacemacs initialization."
    '(org-fontify-quote-and-verse-blocks t)
    '(org-link-translation-function 'toc-org-unhrefify)
    '(package-selected-packages
-     '(ace-jump-helm-line ace-link aggressive-indent all-the-icons auto-compile
-                          auto-highlight-symbol auto-yasnippet blacken
-                          centered-cursor-mode clean-aindent-mode code-cells
-                          code-review column-enforce-mode company-nixos-options
-                          company-web consult-lsp csv-mode cython-mode dap-mode
-                          define-word devdocs diminish dired-quick-sort direnv
-                          disable-mouse djangonaut dotenv-mode drag-stuff
-                          dumb-jump eat edit-indirect elisp-def elisp-demos
-                          elisp-slime-nav emmet-mode emr eval-sexp-fu evil-anzu
-                          evil-args evil-cleverparens evil-collection
-                          evil-easymotion evil-escape evil-evilified-state
-                          evil-exchange evil-goggles evil-iedit-state
-                          evil-indent-plus evil-lion evil-lisp-state evil-matchit
-                          evil-mc evil-nerd-commenter evil-numbers evil-org
-                          evil-surround evil-textobj-line evil-tutor
-                          evil-unimpaired evil-visual-mark-mode evil-visualstar
-                          expand-region eyebrowse fancy-battery flycheck-elsa
-                          flycheck-package flycheck-pos-tip flyspell-correct-helm
-                          gh-md git-link git-messenger git-modes git-timemachine
+     '(ace-jump-helm-line ace-link aggressive-indent all-the-icons auctex
+                          auto-compile auto-highlight-symbol auto-yasnippet
+                          blacken cdlatex centered-cursor-mode clean-aindent-mode
+                          code-cells code-review column-enforce-mode company-lua
+                          company-nixos-options company-web consult-lsp csv-mode
+                          cython-mode dap-mode define-word devdocs diminish
+                          dired-quick-sort direnv disable-mouse djangonaut
+                          dotenv-mode drag-stuff dumb-jump eat edit-indirect
+                          elisp-def elisp-demos elisp-slime-nav emmet-mode emr
+                          eval-sexp-fu evil-anzu evil-args evil-cleverparens
+                          evil-collection evil-easymotion evil-escape
+                          evil-evilified-state evil-exchange evil-goggles
+                          evil-iedit-state evil-indent-plus evil-lion
+                          evil-lisp-state evil-matchit evil-mc evil-nerd-commenter
+                          evil-numbers evil-org evil-surround evil-textobj-line
+                          evil-tutor evil-unimpaired evil-visual-mark-mode
+                          evil-visualstar expand-region eyebrowse fancy-battery
+                          flycheck-elsa flycheck-package flycheck-pos-tip
+                          flyspell-correct-helm ggtags gh-md git-link
+                          git-messenger git-modes git-timemachine
                           gitignore-templates gnuplot golden-ratio
                           google-translate helm-ag helm-c-yasnippet helm-comint
                           helm-company helm-css-scss helm-descbinds helm-git-grep
@@ -838,20 +847,20 @@ This function is called at the very end of Spacemacs initialization."
                           indent-guide info+ inspector js-doc js2-refactor
                           json-mode json-navigator json-reformat link-hint
                           live-py-mode livid-mode lorem-ipsum lsp-mode lsp-origami
-                          lsp-pyright lsp-treemacs lsp-ui macrostep magit-popup
-                          markdown-toc multi-line mwim nameless nix-mode
-                          nodejs-repl npm-mode open-junk-file org-cliplink
-                          org-contrib org-download org-journal org-mime
-                          org-pomodoro org-present org-projectile org-rich-yank
-                          org-super-agenda org-superstar org-transclusion
-                          orgit-forge origami overseer ox-pandoc page-break-lines
-                          pandoc-mode paradox password-generator pcre2el pdf-tools
-                          pdf-view-restore pet pip-requirements pipenv pippel
-                          poetry popwin prettier-js pug-mode py-isort pydoc
-                          pyenv-mode pylookup pytest quickrun rainbow-delimiters
-                          ranger reformatter restart-emacs ruff-format sass-mode
-                          scss-mode simpleclip slim-mode smeargle space-doc
-                          spaceline spacemacs-purpose-popwin
+                          lsp-pyright lsp-treemacs lsp-ui lua-mode macrostep
+                          magit-popup markdown-toc multi-line mwim nameless
+                          nix-mode nodejs-repl npm-mode open-junk-file
+                          org-cliplink org-contrib org-download org-journal
+                          org-mime org-pomodoro org-present org-projectile
+                          org-rich-yank org-super-agenda org-superstar
+                          org-transclusion orgit-forge origami overseer ox-pandoc
+                          page-break-lines pandoc-mode paradox password-generator
+                          pcre2el pdf-tools pdf-view-restore pet pip-requirements
+                          pipenv pippel poetry popwin prettier-js pug-mode
+                          py-isort pydoc pyenv-mode pylookup pytest quickrun
+                          rainbow-delimiters ranger reformatter restart-emacs
+                          ruff-format sass-mode scss-mode simpleclip slim-mode
+                          smeargle space-doc spaceline spacemacs-purpose-popwin
                           spacemacs-whitespace-cleanup sphinx-doc
                           string-edit-at-point string-inflection symbol-overlay
                           symon system-packages tablist tagedit term-cursor tern
@@ -860,7 +869,6 @@ This function is called at the very end of Spacemacs initialization."
                           undo-fu undo-fu-session unfill uniline valign
                           vi-tilde-fringe vmd-mode volatile-highlights vundo
                           web-beautify web-mode wgrep wiki-summary winum
-                          writeroom-mode ws-butler xah-fly-keys xkcd yaml-mode
                           yasnippet-snippets yatemplate)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
