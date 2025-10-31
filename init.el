@@ -3,8 +3,7 @@
 ;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
-  "Layer configu
-ration:
+  "Layer configuration:
 This function should only modify configuration layer settings."
   (setq-default
 
@@ -53,7 +52,9 @@ This function should only modify configuration layer settings."
     nixos
     compleseus
     shell
-    latex
+    (latex :variables latex-backend 'lsp)
+    ;; pdf
+    ;; spacemacs-org
 
     git
     helm
@@ -78,8 +79,9 @@ This function should only modify configuration layer settings."
 
     (org :variables
          ;; org-enable-modern-support t
-         ;; org-enable-roam-support t
-         ;; org-enable-roam-ui t
+         org-enable-roam-support t
+         org-enable-roam-ui t
+         org-enable-roam-protocol t
          org-startup-indented t
          org-indent-mode t
          org-hide-emphasis-markers t
@@ -92,7 +94,7 @@ This function should only modify configuration layer settings."
     ;; (shell :variables
     ;;        shell-default-height 30
     ;;        shell-default-position 'bottom)
-    spell-checking
+    ;; spell-checking
     syntax-checking
     treemacs)
 
@@ -108,12 +110,25 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages '
    (simpleclip
     uniline
+    zotero
+    org-download
+    zotra
     vale
+    org-fragtog
+    org-latex-impatient
     djangonaut
     web-mode
     yasnippet-snippets
+    yasnippet
     direnv
     wiki-summary
+    (use-package org-noter
+      :straight
+      (:repo "org-noter/org-noter"
+             :host github
+             :type git
+             :files ("*.el" "modules/*.el")))
+    names
     org-super-agenda
     eat
     consult)
@@ -617,12 +632,21 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  ;; (setq org-superstar-headline-bullets-list '(?◉ ?○ ?✸ ?✿ ?  ? ?  ))
-  ;; (setq org-superstar-headline-bullets-list '("\u263a" "\u2622" "\u2622" "\u2622" "\u269b" "\u262f" "\u26e6" "\u2620"  "\u2732" "\u2731" "\u273b" "\u273c" "\u2725" "\u273f" "\u2740" "\u2741" "\u2742" "\u2743" "\u2744" "\u2745" "\u2746" "\u2747"))
-  ;; (setq org-superstar-headline-bullets-list '("\u25c9" "\u25cb" "\u2738" "\u273f" "\u2724" "\u271c" "\u25c6" "\u25b6"))
   (setq org-superstar-headline-bullets-list '("\u25c9" "\u25cb" "\u25cf" "\u25ce" "\u25c8" "\u25c7" "\u25c6"))
   (add-hook 'org-mode-hook #'visual-line-mode)
 
+
+
+  (use-package org-fragtog
+    :hook (org-mode . org-fragtog-mode))
+  (use-package org-latex-impatient
+    :defer t
+    :hook (org-mode . org-latex-impatient-mode)
+    :init
+    (setq org-latex-impatient-tex2svg-bin
+          ;; location of tex2svg executable
+          "/etc/profiles/per-user/mike/bin/tex2svg")
+    (setq org-latex-impatient-scale 1.0))
   (use-package
     direnv
     :ensure t
@@ -630,6 +654,13 @@ before packages are loaded."
     (direnv-mode)
     )
 
+  (use-package org-grapher
+    :load-path "~/Library/Emacs-Packages/"
+    :ensure nil
+    :config
+    )
+
+  (setq org-grapher-notes-directory "~/Documents/Org/")
 
   (setq select-enable-clipboard nil)
   (setq simpleclip-unmark-on-copy t)
@@ -683,9 +714,10 @@ before packages are loaded."
   ;; Better copy/paste
   (define-key evil-visual-state-map (kbd "SPC y") 'simpleclip-copy)
   (global-set-key (kbd "C-S-v") 'simpleclip-paste)
+  (with-eval-after-load 'yasnippet
+    (keymap-set yas-minor-mode-map "TAB" #'yas-maybe-expand)
+    (keymap-set yas-minor-mode-map "<tab>" #'yas-maybe-expand))
 
-  (define-key yas-minor-mode-map (kbd "<tab>") yas-maybe-expand)
-  (define-key yas-minor-mode-map (kbd "TAB") yas-maybe-expand)
 
   (use-package web-mode
     :ensure t
@@ -701,6 +733,7 @@ before packages are loaded."
         `((sequence "TODO(t!)" "PLANNING(!)" "IN-PROGRESS(!)" "WAITING(!)" "HOLD(@/!)" "|" "DONE(!)" "CANCELED(@/!)" )))
   (setq org-use-fast-todo-selection t)
 
+  (setq org-roam-directory (file-truename "~/Documents/Org/"))
 
   (setq org-priority-highest ?A
         org-priority-default ?C
@@ -730,7 +763,7 @@ before packages are loaded."
   ;; Resolve open-clocks if idle more than 30 minutes
   (setq org-clock-idle-time 30)
 
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 4))
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 3))
   (setq org-startup-with-inline-images t)
   (setq projectile-project-search-path '("~/Code/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
   (spacemacs/set-leader-keys
@@ -747,7 +780,7 @@ before packages are loaded."
    '(org-code ((t (:foreground "medium sea green"))))
    '(org-link ((t (:foreground "medium aquamarine" :underline t))))
    '(org-verbatim ((t (:foreground "indian red")))))
-  ;; This makes sure that each captured entry gets a unique ID
+
   ;; (add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
 
   (org-babel-do-load-languages
@@ -755,16 +788,12 @@ before packages are loaded."
    '(
      ;; (sh . t)
      (python . t)
+     (calc . t)
      ))
-
-  ;; AUTOMATICLALLY CREATE IDS for all nodes in org mode file on save. This
-  ;; helps when you use link to an entry and then it is moved to a different
-  ;; file.
-  ;; (add-hook 'org-mode-hook
-  ;;           (lambda ()
-  ;;             (add-hook 'before-save-hook 'my/org-add-ids-to-headlines-in-file nil 'local)))
-
   )
+
+
+
 
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -780,7 +809,7 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(blink-cursor-mode nil)
-   '(company-minimum-prefix-length 1)
+   '(company-minimum-prefix-length 5)
    '(flycheck-checkers
      '(lsp emacs-lisp-elsa ada-gnat asciidoctor asciidoc awk-gawk
            bazel-build-buildifier bazel-module-buildifier
@@ -811,29 +840,30 @@ This function is called at the very end of Spacemacs initialization."
            emacs-lisp-package))
    '(markdown-fontify-code-blocks-natively t)
    '(org-agenda-files '("~/Documents/Org/Notes.org"))
-   '(org-fontify-quote-and-verse-blocks t)
    '(org-link-translation-function 'toc-org-unhrefify)
+   '(org-num-face nil)
+   '(org-pretty-entities nil)
    '(package-selected-packages
-     '(ace-jump-helm-line ace-link aggressive-indent all-the-icons auctex
+     '(ace-jump-helm-line ace-link aggressive-indent all-the-icons amsreftex auctex
                           auto-compile auto-highlight-symbol auto-yasnippet
                           blacken cdlatex centered-cursor-mode clean-aindent-mode
-                          code-cells code-review column-enforce-mode company-lua
-                          company-nixos-options company-web consult-lsp csv-mode
-                          cython-mode dap-mode define-word devdocs diminish
-                          dired-quick-sort direnv disable-mouse djangonaut
-                          dotenv-mode drag-stuff dumb-jump eat edit-indirect
-                          elisp-def elisp-demos elisp-slime-nav emmet-mode emr
-                          eval-sexp-fu evil-anzu evil-args evil-cleverparens
-                          evil-collection evil-easymotion evil-escape
-                          evil-evilified-state evil-exchange evil-goggles
-                          evil-iedit-state evil-indent-plus evil-lion
-                          evil-lisp-state evil-matchit evil-mc evil-nerd-commenter
-                          evil-numbers evil-org evil-surround evil-textobj-line
-                          evil-tutor evil-unimpaired evil-visual-mark-mode
-                          evil-visualstar expand-region eyebrowse fancy-battery
-                          flycheck-elsa flycheck-package flycheck-pos-tip
-                          flyspell-correct-helm ggtags gh-md git-link
-                          git-messenger git-modes git-timemachine
+                          code-cells code-review column-enforce-mode
+                          company-auctex company-lua company-math
+                          company-nixos-options company-reftex company-web
+                          consult-lsp csv-mode cython-mode dap-mode define-word
+                          devdocs diminish dired-quick-sort direnv disable-mouse
+                          djangonaut dotenv-mode drag-stuff dumb-jump eat
+                          edit-indirect elisp-def elisp-demos elisp-slime-nav
+                          emmet-mode emr eval-sexp-fu evil-anzu evil-args
+                          evil-cleverparens evil-collection evil-easymotion
+                          evil-escape evil-evilified-state evil-exchange
+                          evil-goggles evil-iedit-state evil-indent-plus evil-lion
+                          evil-numbers evil-org evil-surround evil-tex
+                          evil-textobj-line evil-tutor evil-unimpaired
+                          evil-visual-mark-mode evil-visualstar expand-region
+                          eyebrowse fancy-battery flycheck-elsa flycheck-package
+                          flycheck-pos-tip flyspell-correct-helm ggtags gh-md
+                          git-link git-messenger git-modes git-timemachine
                           gitignore-templates gnuplot golden-ratio
                           google-translate helm-ag helm-c-yasnippet helm-comint
                           helm-company helm-css-scss helm-descbinds helm-git-grep
@@ -845,36 +875,43 @@ This function is called at the very end of Spacemacs initialization."
                           holy-mode hungry-delete hybrid-mode impatient-mode
                           indent-guide info+ inspector js-doc js2-refactor
                           json-mode json-navigator json-reformat link-hint
-                          live-py-mode livid-mode lorem-ipsum lsp-mode lsp-origami
-                          lsp-pyright lsp-treemacs lsp-ui lua-mode macrostep
-                          magit-popup markdown-toc multi-line mwim nameless
-                          nix-mode nodejs-repl npm-mode open-junk-file
-                          org-cliplink org-contrib org-download org-journal
-                          org-mime org-pomodoro org-present org-projectile
-                          org-rich-yank org-super-agenda org-superstar
-                          org-transclusion orgit-forge origami overseer ox-pandoc
-                          page-break-lines pandoc-mode paradox password-generator
-                          pcre2el pdf-tools pdf-view-restore pet pip-requirements
-                          pipenv pippel poetry popwin prettier-js pug-mode
-                          py-isort pydoc pyenv-mode pylookup pytest quickrun
-                          rainbow-delimiters ranger reformatter restart-emacs
-                          ruff-format sass-mode scss-mode simpleclip slim-mode
-                          smeargle space-doc spaceline spacemacs-purpose-popwin
-                          spacemacs-whitespace-cleanup sphinx-doc
-                          string-edit-at-point string-inflection symbol-overlay
-                          symon system-packages tablist tagedit term-cursor tern
-                          toc-org treemacs-evil treemacs-icons-dired
-                          treemacs-magit treemacs-persp treemacs-projectile
-                          undo-fu undo-fu-session unfill uniline valign
-                          vi-tilde-fringe vmd-mode volatile-highlights vundo
-                          web-beautify web-mode wgrep wiki-summary winum
-                          yasnippet-snippets yatemplate)))
+                          live-py-mode livid-mode lorem-ipsum lsp-latex lsp-mode
+                          lsp-origami lsp-pyright lsp-treemacs lsp-ui lua-mode
+                          macrostep magit-popup markdown-toc math-symbol-lists
+                          multi-line mwim nameless names nix-mode nodejs-repl
+                          npm-mode oauth open-junk-file org-cliplink org-contrib
+                          org-download org-fragtog org-journal org-latex-impatient
+                          org-mime org-modern org-noter org-pomodoro org-present
+                          org-projectile org-rich-yank org-roam org-roam-ui
+                          org-super-agenda org-superstar org-transclusion
+                          orgit-forge origami overseer ox-pandoc page-break-lines
+                          pandoc-mode paradox password-generator pcre2el
+                          pdf-continuous-scroll-mode pdf-tools pdf-view-restore
+                          pet pip-requirements pipenv pippel poetry popwin
+                          prettier-js pug-mode py-isort pydoc pyenv-mode pylookup
+                          pytest quickrun rainbow-delimiters ranger reformatter
+                          restart-emacs ruff-format sass-mode scss-mode simpleclip
+                          slim-mode smeargle space-doc spaceline
+                          spacemacs-purpose-popwin spacemacs-whitespace-cleanup
+                          sphinx-doc string-edit-at-point string-inflection
+                          symbol-overlay symon system-packages tablist tagedit
+                          term-cursor tern toc-org treemacs-evil
+                          treemacs-icons-dired treemacs-magit treemacs-persp
+                          treemacs-projectile ultra-scroll undo-fu undo-fu-session
+                          unfill uniline valign vi-tilde-fringe vmd-mode
+                          volatile-highlights vundo web-beautify web-mode
+                          websocket wgrep wiki-summary winum yasnippet-snippets
+                          yatemplate zotero zotra))
+   '(zotero-auth-token #s(zotero-auth-token "" "" nil nil) t))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(org-code ((t (:foreground "medium sea green"))))
+   '(org-level-1 ((t (:inherit bold :extend nil :foreground "goldenrod" :height 1.3))))
+   '(org-level-3 ((t (:extend nil :foreground "medium sea green" :weight normal :height 1.1))))
+   '(org-level-4 ((t (:extend nil :foreground "medium purple" :weight normal))))
    '(org-link ((t (:foreground "medium aquamarine" :underline t))))
    '(org-verbatim ((t (:foreground "indian red")))))
   )
