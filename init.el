@@ -51,6 +51,7 @@ This function should only modify configuration layer settings."
     emacs-lisp
     nixos
     compleseus
+    themes-megapack
     shell
     (latex :variables latex-backend 'lsp)
     ;; pdf
@@ -112,6 +113,7 @@ This function should only modify configuration layer settings."
     uniline
     zotero
     org-download
+    nerd-icons
     zotra
     org-fragtog
     org-latex-impatient
@@ -119,6 +121,7 @@ This function should only modify configuration layer settings."
     web-mode
     yasnippet-snippets
     yasnippet
+    ligature
     direnv
     wiki-summary
     (use-package org-noter
@@ -295,11 +298,12 @@ It should only modify the values of Spacemacs settings."
    ;; running Emacs in terminal. The font set here will be used for default and
    ;; fixed-pitch faces. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
-   ;; Point size is recommended, because it's device independent. (defnetbrains Mono e
-   dotspacemacs-default-font '("JetBrainsMono Nerd Font"
-                               :size 13.0
-                               :weight normal
-                               :width normal)
+   ;; Point size is recommended, because it's device independent.
+   dotspacemacs-default-font '(("JetBrainsMono Nerd Font"
+                                :size 14.0
+                                :weight normal
+                                :width normal)
+                               ("Symbols Nerd Font Mono"))
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -634,6 +638,7 @@ before packages are loaded."
   (setq org-superstar-headline-bullets-list '("\u25c9" "\u25cb" "\u25cf" "\u25ce" "\u25c8" "\u25c7" "\u25c6"))
   (add-hook 'org-mode-hook #'visual-line-mode)
 
+  (require 'nerd-icons)
 
 
   (use-package org-fragtog
@@ -659,6 +664,46 @@ before packages are loaded."
     :config
     )
 
+  ;; Enable automatic pairing of delimiters
+  (electric-pair-mode 1)
+
+  (defun my/prettify-symbols-setup ()
+    ;; checkboxes
+    (push '("[ ]" . "") prettify-symbols-alist)
+    (push '("[X]" . "") prettify-symbols-alist)
+    (push '("[-]" . "󱋭" ) prettify-symbols-alist)
+
+    ;; org-abel
+    (push '("#+begin_src" . ?\u226b) prettify-symbols-alist)
+    (push '("#+end_src" . ?\u226b) prettify-symbols-alist)
+    (push '("#+begin_src" . ?\u226b) prettify-symbols-alist)
+    (push '("#+end_src" . ?\u226b) prettify-symbols-alist)
+
+    (push '("#+begin_quote" . ?\u275d) prettify-symbols-alist)
+    (push '("#+end_quote" . ?\u275e) prettify-symbols-alist)
+
+    ;; drawers
+    (push '(":properties:" . "\ueb52") prettify-symbols-alist)
+
+    ;; tags
+    (push '(":projects:" . "\uf02d") prettify-symbols-alist)
+    (push '(":work:"     . "\uf02d") prettify-symbols-alist)
+    (push '(":inbox:"    . "\uf42f") prettify-symbols-alist)
+    (push '(":task:"     . "\uf01c") prettify-symbols-alist)
+    (push '(":thesis:"   . "\uf448") prettify-symbols-alist)
+    (push '(":uio:"      . "\uf448") prettify-symbols-alist)
+    (push '(":emacs:"    . "\ue632") prettify-symbols-alist)
+    (push '(":learn:"    . "\ue22f") prettify-symbols-alist)
+    (push '(":code:"     . "\uf489") prettify-symbols-alist)
+
+    (prettify-symbols-mode))
+
+  (add-hook 'org-mode-hook        #'my/prettify-symbols-setup)
+  (add-hook 'org-agenda-mode-hook #'my/prettify-symbols-setup)
+
+
+
+
   (setq org-grapher-notes-directory "~/Documents/Org/")
 
   (setq select-enable-clipboard nil)
@@ -666,6 +711,7 @@ before packages are loaded."
   (setq auto-save-visited-mode t)
   (setq auto-save-visited-interval 20)
   (setq auto-save-interval 20)
+  (use-package fira-code-mode)
   (require 'simpleclip)
   (simpleclip-mode 1)
   (add-hook 'org-capture-mode-hook 'evil-insert-state)
@@ -697,6 +743,14 @@ before packages are loaded."
   (define-key evil-normal-state-map (kbd ", h p") 'highlight-phrase)
   (define-key evil-normal-state-map (kbd ", h l") 'highlight-lines-matching-regexp)
   (define-key evil-normal-state-map (kbd ", h u") 'unhighlight-regexp)
+
+  (define-key evil-insert-state-map (kbd "M-i") 'org-roam-node-insert)
+  (define-key evil-insert-state-map (kbd "M-f") 'org-roam-node-find)
+  (define-key evil-insert-state-map (kbd "M-c") 'insert-char)
+  (define-key evil-insert-state-map (kbd "M-w") 'forward-word)
+  (define-key evil-insert-state-map (kbd "M-d") 'downcase-dwim)
+
+  (define-key evil-normal-state-map (kbd "M-d") 'downcase-dwim)
 
   ;; j and k should behave like gj and gk
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
@@ -769,9 +823,27 @@ before packages are loaded."
     "oc" 'org-capture
     "oa" 'org-agenda
     "osl" 'org-store-link
-    "oil" 'org-insert-last-stored-link
+    "ol" 'org-insert-last-stored-link
     "on" 'bookmark-jump
-    "oh" 'consult-org-heading)
+    "oh" 'consult-org-heading
+    "oi" 'org-roam-node-insert
+    "of" 'org-roam-node-find
+    "od" 'org-roam-db-sync
+    )
+
+  ;; Enable ligatures in programming modes
+  (ligature-set-ligatures 'org-mode '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+                                      ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+                                      "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+                                      "#_(" ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*" "/**"
+                                      "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+                                      "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+                                      "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+                                      "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+                                      "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+                                      "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%"))
+
+  (global-ligature-mode 't)
 
   (setq org-export-with-broken-links t)
 
@@ -809,6 +881,18 @@ This function is called at the very end of Spacemacs initialization."
    ;; If there is more than one, they won't work right.
    '(blink-cursor-mode nil)
    '(company-minimum-prefix-length 5)
+   '(custom-safe-themes
+     '("4d5d11bfef87416d85673947e3ca3d3d5d985ad57b02a7bb2e32beaf785a100e"
+       "720838034f1dd3b3da66f6bd4d053ee67c93a747b219d1c546c41c4e425daf93"
+       "cffbae32e5e3859f671c4b1dc2a0d95a4a6f2d071f7d9b9adbe66aaf1a865008"
+       "b9c3cad81999816c55bad4904db1c955702cac2de1c8042f8c998455134bcdd6"
+       "fdaf036ac62069f9b785ad2486b8106fb704b7c898d73ff7f66dc657523349d3"
+       "24fba8d15d029ca2ed94dc4722459e9b64d679d7ae14b77b61412e2c85b3b641"
+       "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1"
+       "236b9b9af6ebae43d98b934d27566ddaf9e47bdcb101d945435aeac0e4e9a73d"
+       "ade194273a74776a3043049bdab532587813493ec9530d9ec7bb19c29c3ee8bd"
+       "ebdf1a86b77a768fb43e4b3e39766326b53974479b040eb0da5324431a7bf2be"
+       "74e27bf8147ee1bc825fdd819f9d3e85869979dec40c5105f18149bedb4bd881" default))
    '(flycheck-checkers
      '(lsp emacs-lisp-elsa ada-gnat asciidoctor asciidoc awk-gawk
            bazel-build-buildifier bazel-module-buildifier
@@ -838,75 +922,108 @@ This function is called at the very end of Spacemacs initialization."
            xml-xmllint yaml-actionlint yaml-jsyaml yaml-ruby yaml-yamllint
            emacs-lisp-package))
    '(markdown-fontify-code-blocks-natively t)
+   '(org-agenda-block-separator 61)
    '(org-agenda-files '("~/Documents/Org/Notes.org"))
    '(org-link-translation-function 'toc-org-unhrefify)
    '(org-num-face nil)
    '(org-pretty-entities nil)
    '(package-selected-packages
-     '(ace-jump-helm-line ace-link aggressive-indent all-the-icons amsreftex auctex
+     '(ace-jump-helm-line ace-link afternoon-theme aggressive-indent alect-themes
+                          all-the-icons ample-theme ample-zen-theme amsreftex
+                          anti-zenburn-theme apropospriate-theme auctex
                           auto-compile auto-highlight-symbol auto-yasnippet
-                          blacken cdlatex centered-cursor-mode clean-aindent-mode
-                          code-cells code-review column-enforce-mode
+                          autothemer badwolf-theme birds-of-paradise-plus-theme
+                          blacken bubbleberry-theme busybee-theme cdlatex
+                          centered-cursor-mode cherry-blossom-theme
+                          chocolate-theme clean-aindent-mode clues-theme
+                          code-cells code-review color-theme-sanityinc-solarized
+                          color-theme-sanityinc-tomorrow column-enforce-mode
                           company-auctex company-lua company-math
                           company-nixos-options company-reftex company-web
-                          consult-lsp csv-mode cython-mode dap-mode define-word
-                          devdocs diminish dired-quick-sort direnv disable-mouse
-                          djangonaut dotenv-mode drag-stuff dumb-jump eat
-                          edit-indirect elisp-def elisp-demos elisp-slime-nav
-                          emmet-mode emr eval-sexp-fu evil-anzu evil-args
+                          consult-lsp csv-mode cyberpunk-theme cython-mode
+                          dakrone-theme dap-mode darkmine-theme darkokai-theme
+                          darktooth-theme define-word devdocs diminish
+                          dired-quick-sort direnv disable-mouse django-theme
+                          djangonaut doom-themes dotenv-mode dracula-theme
+                          drag-stuff dumb-jump eat edit-indirect ef-themes
+                          elisp-def elisp-demos elisp-slime-nav emmet-mode emr
+                          espresso-theme eval-sexp-fu evil-anzu evil-args
                           evil-cleverparens evil-collection evil-easymotion
                           evil-escape evil-evilified-state evil-exchange
                           evil-goggles evil-iedit-state evil-indent-plus evil-lion
                           evil-numbers evil-org evil-surround evil-tex
                           evil-textobj-line evil-tutor evil-unimpaired
-                          evil-visual-mark-mode evil-visualstar expand-region
-                          eyebrowse fancy-battery flycheck-elsa flycheck-package
-                          flycheck-pos-tip flyspell-correct-helm ggtags gh-md
-                          git-link git-messenger git-modes git-timemachine
-                          gitignore-templates gnuplot golden-ratio
-                          google-translate helm-ag helm-c-yasnippet helm-comint
-                          helm-company helm-css-scss helm-descbinds helm-git-grep
-                          helm-ls-git helm-lsp helm-make helm-mode-manager
-                          helm-nixos-options helm-org helm-org-rifle
-                          helm-projectile helm-purpose helm-pydoc helm-swoop
-                          helm-themes helm-xref hide-comnt highlight-indentation
+                          evil-visual-mark-mode evil-visualstar exotica-theme
+                          expand-region eyebrowse eziam-themes fancy-battery
+                          farmhouse-themes fira-code-mode flatland-theme
+                          flatui-theme flycheck-elsa flycheck-package
+                          flycheck-pos-tip flyspell-correct-helm gandalf-theme
+                          ggtags gh-md git-link git-messenger git-modes
+                          git-timemachine gitignore-templates gnuplot golden-ratio
+                          google-translate gotham-theme grandshell-theme
+                          gruber-darker-theme gruvbox-theme hc-zenburn-theme
+                          helm-ag helm-c-yasnippet helm-comint helm-company
+                          helm-css-scss helm-descbinds helm-git-grep helm-ls-git
+                          helm-lsp helm-make helm-mode-manager helm-nixos-options
+                          helm-org helm-org-rifle helm-projectile helm-purpose
+                          helm-pydoc helm-swoop helm-themes helm-xref hemisu-theme
+                          heroku-theme hide-comnt highlight-indentation
                           highlight-numbers highlight-parentheses hl-todo
                           holy-mode hungry-delete hybrid-mode impatient-mode
-                          indent-guide info+ inspector js-doc js2-refactor
-                          json-mode json-navigator json-reformat link-hint
-                          live-py-mode livid-mode lorem-ipsum lsp-latex lsp-mode
-                          lsp-origami lsp-pyright lsp-treemacs lsp-ui lua-mode
-                          macrostep magit-popup markdown-toc math-symbol-lists
-                          multi-line mwim nameless names nix-mode nodejs-repl
-                          npm-mode oauth open-junk-file org-cliplink org-contrib
-                          org-download org-fragtog org-journal org-latex-impatient
-                          org-mime org-modern org-noter org-pomodoro org-present
-                          org-projectile org-rich-yank org-roam org-roam-ui
-                          org-super-agenda org-superstar org-transclusion
-                          orgit-forge origami overseer ox-pandoc page-break-lines
-                          pandoc-mode paradox password-generator pcre2el
-                          pdf-continuous-scroll-mode pdf-tools pdf-view-restore
-                          pet pip-requirements pipenv pippel poetry popwin
-                          prettier-js pug-mode py-isort pydoc pyenv-mode pylookup
-                          pytest quickrun rainbow-delimiters ranger reformatter
-                          restart-emacs ruff-format sass-mode scss-mode simpleclip
-                          slim-mode smeargle space-doc spaceline
+                          indent-guide info+ inkpot-theme inspector ir-black-theme
+                          jazz-theme jbeans-theme js-doc js2-refactor json-mode
+                          json-navigator json-reformat kaolin-themes ligature
+                          light-soap-theme link-hint live-py-mode livid-mode
+                          lorem-ipsum lsp-latex lsp-mode lsp-origami lsp-pyright
+                          lsp-treemacs lsp-ui lua-mode lush-theme macrostep
+                          madhat2r-theme magit-popup markdown-toc material-theme
+                          math-symbol-lists minimal-theme modus-themes moe-theme
+                          molokai-theme monochrome-theme monokai-theme multi-line
+                          mustang-theme mwim nameless names naquadah-theme
+                          nerd-icons nix-mode noctilux-theme nodejs-repl npm-mode
+                          oauth obsidian-theme occidental-theme oldlace-theme
+                          omtose-phellack-themes open-junk-file org-cliplink
+                          org-contrib org-download org-fragtog org-journal
+                          org-latex-impatient org-mime org-modern org-noter
+                          org-pomodoro org-present org-projectile org-rich-yank
+                          org-roam org-roam-ui org-super-agenda org-superstar
+                          org-transclusion organic-green-theme orgit-forge origami
+                          overseer ox-pandoc page-break-lines pandoc-mode paradox
+                          password-generator pcre2el pdf-continuous-scroll-mode
+                          pdf-tools pdf-view-restore pet phoenix-dark-mono-theme
+                          phoenix-dark-pink-theme pip-requirements pipenv pippel
+                          planet-theme poetry popwin prettier-js
+                          professional-theme pug-mode purple-haze-theme py-isort
+                          pydoc pyenv-mode pylookup pytest quickrun
+                          railscasts-theme rainbow-delimiters ranger rebecca-theme
+                          reformatter restart-emacs reverse-theme ruff-format
+                          sass-mode scss-mode seti-theme simpleclip slim-mode
+                          smeargle smyx-theme soft-charcoal-theme
+                          soft-morning-theme soft-stone-theme solarized-theme
+                          soothe-theme space-doc spacegray-theme spaceline
                           spacemacs-purpose-popwin spacemacs-whitespace-cleanup
                           sphinx-doc string-edit-at-point string-inflection
-                          symbol-overlay symon system-packages tablist tagedit
-                          term-cursor tern toc-org treemacs-evil
-                          treemacs-icons-dired treemacs-magit treemacs-persp
-                          treemacs-projectile ultra-scroll undo-fu undo-fu-session
-                          unfill uniline valign vi-tilde-fringe vmd-mode
-                          volatile-highlights vundo web-beautify web-mode
-                          websocket wgrep wiki-summary winum yasnippet-snippets
-                          yatemplate zotero zotra))
+                          subatomic-theme subatomic256-theme sublime-themes
+                          sunny-day-theme symbol-overlay symon system-packages
+                          tablist tagedit tango-2-theme tango-plus-theme
+                          tangotango-theme tao-theme term-cursor tern toc-org
+                          toxi-theme treemacs-evil treemacs-icons-dired
+                          treemacs-magit treemacs-persp treemacs-projectile
+                          twilight-anti-bright-theme twilight-bright-theme
+                          twilight-theme ujelly-theme ultra-scroll
+                          underwater-theme undo-fu undo-fu-session unfill uniline
+                          valign vi-tilde-fringe vmd-mode volatile-highlights
+                          vundo web-beautify web-mode websocket wgrep
+                          white-sand-theme wiki-summary winum yasnippet-snippets
+                          yatemplate zen-and-art-theme zenburn-theme zonokai-emacs
+                          zotero zotra))
    '(zotero-auth-token #s(zotero-auth-token "" "" nil nil) t))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
+   '(default ((t (:background nil))))
    '(org-code ((t (:foreground "medium sea green"))))
    '(org-level-1 ((t (:inherit bold :extend nil :foreground "goldenrod" :height 1.3))))
    '(org-level-3 ((t (:extend nil :foreground "medium sea green" :weight normal :height 1.1))))
