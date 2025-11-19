@@ -299,11 +299,13 @@ It should only modify the values of Spacemacs settings."
    ;; fixed-pitch faces. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent.
-   dotspacemacs-default-font '(("JetBrainsMono Nerd Font"
-                                :size 14.0
-                                :weight normal
-                                :width normal)
-                               ("Symbols Nerd Font Mono"))
+   dotspacemacs-default-font '("JetBrainsMono Nerd Font"
+                               :size 20.0
+                               :weight normal
+                               :width normal)
+
+   ;; Default icons font, it can be `all-the-icons' or `nerd-icons'.
+   dotspacemacs-default-icons-font 'nerd-icons
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -370,6 +372,14 @@ It should only modify the values of Spacemacs settings."
    ;; paste something, pressing `C-j' and `C-k' several times cycles through the
    ;; elements in the `kill-ring'. (default nil)
    dotspacemacs-enable-paste-transient-state nil
+
+   ;; Make consecutive tab key presses after commands such as
+   ;; `spacemacs/alternate-buffer' (SPC TAB) cycle through previous
+   ;; buffers/windows/etc. Please see the option's docstring for more information.
+   ;; Set the option to t in order to enable cycling for all current and
+   ;; future cycling commands. Alternatively, choose a subset of the currently
+   ;; supported commands: '(alternate-buffer alternate-window). (default nil)
+   dotspacemacs-enable-cycling nil
 
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
@@ -702,7 +712,7 @@ before packages are loaded."
   (add-hook 'org-agenda-mode-hook #'my/prettify-symbols-setup)
 
 
-
+  ;; (setq font-use-system-font t)
 
   (setq org-grapher-notes-directory "~/Documents/Org/")
 
@@ -718,10 +728,10 @@ before packages are loaded."
 
   (setq org-capture-templates
         '(("e" "Emacs")
-          ("et" "Tasks" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Emacs" "Tasks")
-           "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
-          ("eq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Emacs" "Notes" "Questions")
-           "* TODO [#B] %? :emacs:\n:Created: %T" :prepend t)
+          ("et" "Tasks" entry (file+olp "~/Documents/Org/20251104104130-emacs.org" "Tasks")
+           "* %? :emacs:\n:Created: %T" :prepend t)
+          ("eq" "Questions" entry (file+olp "~/Documents/Org/20251104104130-emacs.org" "Questions")
+           "* %? :emacs:\n:Created: %T" :prepend t)
           ("d" "Django")
           ("dq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Questions About Tools and Concepts")
            "* %? :django:\n:Created: %T" :prepend t)
@@ -771,6 +781,8 @@ before packages are loaded."
     (keymap-set yas-minor-mode-map "TAB" #'yas-maybe-expand)
     (keymap-set yas-minor-mode-map "<tab>" #'yas-maybe-expand))
 
+  (setq org-agenda-files (quote("~/Documents/Org")))
+  (setq org-agenda-include-diary t)
 
   (use-package web-mode
     :ensure t
@@ -783,7 +795,7 @@ before packages are loaded."
           '(("css" . (ac-source-css-property))
             ("html" . (ac-source-words-in-buffer ac-source-abbrev)))))
   (setq org-todo-keywords
-        `((sequence "TODO(t!)" "PLANNING(!)" "IN-PROGRESS(!)" "WAITING(!)" "HOLD(@/!)" "|" "DONE(!)" "CANCELED(@/!)" )))
+        `((sequence "TODO(t!)" "PLANNING" "IN-PROGRESS" "WAITING" "HOLD" "NO-TIME" "|" "DONE(!)" "CANCELED@/!)" )))
   (setq org-use-fast-todo-selection t)
 
   (setq org-roam-directory (file-truename "~/Documents/Org/"))
@@ -802,6 +814,7 @@ before packages are loaded."
           ("IN-PROGRESS" . (:foreground "MediumPurple2" :weight bold))
           ("WAITING" . (:foreground "DarkOrange" :weight bold))
           ("HOLD" . (:foreground "Red" :weight bold))
+          ("NO-TIME" . (:foreground "Pink" :weight bold))
           ("DONE" . (:foreground "LimeGreen" :weight bold))
           ("CANCELED" . (:foreground "LimeGreen" :weight bold))
           ))
@@ -923,7 +936,8 @@ This function is called at the very end of Spacemacs initialization."
            emacs-lisp-package))
    '(markdown-fontify-code-blocks-natively t)
    '(org-agenda-block-separator 61)
-   '(org-agenda-files '("~/Documents/Org/Notes.org"))
+   '(org-agenda-files
+     '("~/Documents/Org/" "~/Documents/Org/Notes.org" "~/Documents/Org/daily/"))
    '(org-link-translation-function 'toc-org-unhrefify)
    '(org-num-face nil)
    '(org-pretty-entities nil)
