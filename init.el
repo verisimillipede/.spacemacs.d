@@ -278,7 +278,8 @@ It should only modify the values of Spacemacs settings."
    ;; package can be defined with `:package', or a theme can be defined with
    ;; `:location' to download the theme package, refer the themes section in
    ;; DOCUMENTATION.org for the full theme specifications.
-   dotspacemacs-themes '(spacemacs-dark
+   dotspacemacs-themes '(zenburn
+                         spacemacs-dark
                          spacemacs-light)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -686,8 +687,6 @@ before packages are loaded."
     ;; org-abel
     (push '("#+begin_src" . ?\u226b) prettify-symbols-alist)
     (push '("#+end_src" . ?\u226b) prettify-symbols-alist)
-    (push '("#+begin_src" . ?\u226b) prettify-symbols-alist)
-    (push '("#+end_src" . ?\u226b) prettify-symbols-alist)
 
     (push '("#+begin_quote" . ?\u275d) prettify-symbols-alist)
     (push '("#+end_quote" . ?\u275e) prettify-symbols-alist)
@@ -777,9 +776,14 @@ before packages are loaded."
   ;; Better copy/paste
   (define-key evil-visual-state-map (kbd "SPC y") 'simpleclip-copy)
   (global-set-key (kbd "C-S-v") 'simpleclip-paste)
-  (with-eval-after-load 'yasnippet
-    (keymap-set yas-minor-mode-map "TAB" #'yas-maybe-expand)
-    (keymap-set yas-minor-mode-map "<tab>" #'yas-maybe-expand))
+                                        ; (with-eval-after-load 'yasnippet
+                                        ;   (keymap-set yas-minor-mode-map "TAB" #'yas-maybe-expand)
+                                        ;   (keymap-set yas-minor-mode-map "<tab>" #'yas-maybe-expand))
+
+  (define-key yas-minor-mode-map (kbd "<tab>") yas-maybe-expand)
+  (define-key yas-minor-mode-map (kbd "TAB") yas-maybe-expand)
+
+  (setq company-minimum-prefix-length 5)
 
   (setq org-agenda-files (quote("~/Documents/Org")))
   (setq org-agenda-include-diary t)
@@ -829,41 +833,42 @@ before packages are loaded."
   ;; Resolve open-clocks if idle more than 30 minutes
   (setq org-clock-idle-time 30)
 
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 3))
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.25))
   (setq org-startup-with-inline-images t)
   (setq projectile-project-search-path '("~/Code/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
   (spacemacs/set-leader-keys
     "oc" 'org-capture
     "oa" 'org-agenda
-    "osl" 'org-store-link
+    ;; "osl" 'org-store-link
     "ol" 'org-insert-last-stored-link
     "on" 'bookmark-jump
     "oh" 'consult-org-heading
     "oi" 'org-roam-node-insert
     "of" 'org-roam-node-find
-    "od" 'org-roam-db-sync
+    "os" 'org-roam-db-sync
+    "od" 'org-roam-dailies-goto-today
+    "ot" 'org-roam-dailies-goto-tomorrow
+    "oy" 'org-roam-dailies-goto-yesterday
     )
 
-  ;; Enable ligatures in programming modes
-  (ligature-set-ligatures 'org-mode '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
-                                      ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
-                                      "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
-                                      "#_(" ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*" "/**"
-                                      "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
-                                      "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
-                                      "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
-                                      "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
-                                      "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
-                                      "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%"))
-
-  (global-ligature-mode 't)
+  (use-package ligature
+    :config
+    (ligature-set-ligatures 'org-mode '("--" "---" "==" "===" "!=" "!==" "=!="
+                                        "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
+                                        "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
+                                        "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
+                                        "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
+                                        "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
+                                        "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
+                                        "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
+                                        "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
+                                        "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
+                                        "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
+                                        ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
+                                        "<:<" ";;;"))
+    (global-ligature-mode t))
 
   (setq org-export-with-broken-links t)
-
-  (custom-set-faces
-   '(org-code ((t (:foreground "medium sea green"))))
-   '(org-link ((t (:foreground "medium aquamarine" :underline t))))
-   '(org-verbatim ((t (:foreground "indian red")))))
 
   ;; (add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
 
@@ -894,8 +899,10 @@ This function is called at the very end of Spacemacs initialization."
    ;; If there is more than one, they won't work right.
    '(blink-cursor-mode nil)
    '(company-minimum-prefix-length 5)
+   '(custom-enabled-themes '(zenburn))
    '(custom-safe-themes
-     '("4d5d11bfef87416d85673947e3ca3d3d5d985ad57b02a7bb2e32beaf785a100e"
+     '("972f792651d32b0506481b9e87b2fbc9b732ae9da2527562668c6e7d149fefda"
+       "4d5d11bfef87416d85673947e3ca3d3d5d985ad57b02a7bb2e32beaf785a100e"
        "720838034f1dd3b3da66f6bd4d053ee67c93a747b219d1c546c41c4e425daf93"
        "cffbae32e5e3859f671c4b1dc2a0d95a4a6f2d071f7d9b9adbe66aaf1a865008"
        "b9c3cad81999816c55bad4904db1c955702cac2de1c8042f8c998455134bcdd6"
@@ -941,6 +948,7 @@ This function is called at the very end of Spacemacs initialization."
    '(org-link-translation-function 'toc-org-unhrefify)
    '(org-num-face nil)
    '(org-pretty-entities nil)
+   '(org-startup-with-latex-preview t)
    '(package-selected-packages
      '(ace-jump-helm-line ace-link afternoon-theme aggressive-indent alect-themes
                           all-the-icons ample-theme ample-zen-theme amsreftex
@@ -1028,9 +1036,10 @@ This function is called at the very end of Spacemacs initialization."
                           underwater-theme undo-fu undo-fu-session unfill uniline
                           valign vi-tilde-fringe vmd-mode volatile-highlights
                           vundo web-beautify web-mode websocket wgrep
-                          white-sand-theme wiki-summary winum yasnippet-snippets
-                          yatemplate zen-and-art-theme zenburn-theme zonokai-emacs
-                          zotero zotra))
+                          white-sand-theme wiki-summary winum
+                          yasnippet-classic-snippets yasnippet-snippets yatemplate
+                          zen-and-art-theme zenburn-theme zonokai-emacs zotero
+                          zotra))
    '(zotero-auth-token #s(zotero-auth-token "" "" nil nil) t))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
@@ -1038,10 +1047,12 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(default ((t (:background nil))))
-   '(org-code ((t (:foreground "medium sea green"))))
-   '(org-level-1 ((t (:inherit bold :extend nil :foreground "goldenrod" :height 1.3))))
-   '(org-level-3 ((t (:extend nil :foreground "medium sea green" :weight normal :height 1.1))))
-   '(org-level-4 ((t (:extend nil :foreground "medium purple" :weight normal))))
-   '(org-link ((t (:foreground "medium aquamarine" :underline t))))
-   '(org-verbatim ((t (:foreground "indian red")))))
+   '(org-checkbox ((t (:foreground "#FFFFEF" :box (:line-width (1 . 1) :style released-button)))))
+   '(org-level-1 ((t nil)))
+   '(org-level-2 ((t nil)))
+   '(org-level-3 ((t nil)))
+   '(org-level-4 ((t nil)))
+   '(org-level-5 ((t nil)))
+   '(org-level-7 ((t nil)))
+   '(org-level-8 ((t nil))))
   )
