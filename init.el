@@ -88,7 +88,6 @@ This function should only modify configuration layer settings."
          org-hide-emphasis-markers t
          org-link-descriptive t
          org-pretty-entities t
-         org-enable-roam-protocol t
          org-enable-valign t
          org-enable-transclusion-support t
          org-enable-org-journal-support t)
