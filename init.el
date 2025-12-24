@@ -124,12 +124,6 @@ This function should only modify configuration layer settings."
     ligature
     direnv
     wiki-summary
-    (use-package org-noter
-      :straight
-      (:repo "org-noter/org-noter"
-             :host github
-             :type git
-             :files ("*.el" "modules/*.el")))
     names
     org-super-agenda
     eat
@@ -301,7 +295,7 @@ It should only modify the values of Spacemacs settings."
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent.
    dotspacemacs-default-font '("JetBrainsMono Nerd Font"
-                               :size 20.0
+                               :size 12.0
                                :weight normal
                                :width normal)
 
@@ -720,7 +714,6 @@ before packages are loaded."
   (setq auto-save-visited-mode t)
   (setq auto-save-visited-interval 20)
   (setq auto-save-interval 20)
-  (use-package fira-code-mode)
   (require 'simpleclip)
   (simpleclip-mode 1)
   (add-hook 'org-capture-mode-hook 'evil-insert-state)
@@ -731,22 +724,24 @@ before packages are loaded."
            "* %? :emacs:\n:Created: %T" :prepend t)
           ("eq" "Questions" entry (file+olp "~/Documents/Org/20251104104130-emacs.org" "Questions")
            "* %? :emacs:\n:Created: %T" :prepend t)
-          ("d" "Django")
-          ("dq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Questions About Tools and Concepts")
-           "* %? :django:\n:Created: %T" :prepend t)
-          ("dt" "Tasks" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Tasks")
-           "* TODO %? :django:\n:Created: %T" :prepend t)
-          ("i" "Inbox" entry (file+olp "~/Documents/Org/Notes.org" "Inbox")
-           "* %?\n:Created: %T" :prepend t)
-          ("s" "Stuff")
-          ("sw" "Stuff I Want" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff I Want")
-           "+ %?\n:Created: %T" :prepend t)
-          ("sb" "Stuff to Buy" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff to Buy")
-           "+ %?\n:Created: %T" :prepend t)
-          ("b" "Birds" entry (file+olp "~/Documents/Org/Notes.org" "Life" "Photography" "Birds")
-           "* %?" :prepend t)
-          ("j" "Journal" entry (file+olp+datetree "~/Documents/Org/journal.org")
-           "*  %?\nEntered on %U\n\n")))
+          ;; ("d" "Django")
+          ;; ("dq" "Questions" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Questions About Tools and Concepts")
+          ;;  "* %? :django:\n:Created: %T" :prepend t)
+          ;; ("dt" "Tasks" entry (file+olp "~/Documents/Org/Notes.org" "Tech" "Django" "Tasks")
+          ;;  "* TODO %? :django:\n:Created: %T" :prepend t)
+          ;; ("i" "Inbox" entry (file+olp "~/Documents/Org/Notes.org" "Inbox")
+          ;;  "* %?\n:Created: %T" :prepend t)
+          ;; ("s" "Stuff")
+          ;; ("sw" "Stuff I Want" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff I Want")
+          ;;  "+ %?\n:Created: %T" :prepend t)
+          ;; ("sb" "Stuff to Buy" item (file+olp "~/Documents/Org/Notes.org" "Life" "Stuff to Buy")
+          ;;  "+ %?\n:Created: %T" :prepend t)
+          ;; ("b" "Birds" entry (file+olp "~/Documents/Org/Notes.org" "Life" "Photography" "Birds")
+          ;;  "* %?" :prepend t)
+          ;; ("j" "Journal" entry (file+olp+datetree "~/Documents/Org/journal.org")
+          ;;  "*  %?\nEntered on %U\n\n")
+          ("j" "journal" entry (file "~/Documents/Org/20251211203914-journal.org")
+           "* %?\nEntered on %T\n\n" :empty-lines 1 :prepend t)))
 
   (define-key evil-normal-state-map (kbd ", h c") 'highlight-changes-mode)
   (define-key evil-normal-state-map (kbd ", h p") 'highlight-phrase)
@@ -770,8 +765,11 @@ before packages are loaded."
   (define-key evil-visual-state-map "k" 'evil-previous-visual-line)
 
   ;; H and L will bring you to the beginning or end of the line
-  (define-key evil-normal-state-map (kbd "H") 'evil-first-non-blank-of-visual-line)
-  (define-key evil-normal-state-map (kbd "L") 'evil-last-non-blank)
+  ;; (define-key evil-normal-state-map (kbd "H") 'evil-first-non-blank-of-visual-line)
+  (define-key evil-normal-state-map (kbd "H") 'evil-beginning-of-visual-line)
+  (define-key evil-normal-state-map (kbd "L") 'evil-end-of-visual-line)
+  ;; (define-key evil-normal-state-map (kbd "L") (kbd "g $"))
+
 
   ;; Better copy/paste
   (define-key evil-visual-state-map (kbd "SPC y") 'simpleclip-copy)
@@ -833,6 +831,18 @@ before packages are loaded."
   ;; Resolve open-clocks if idle more than 30 minutes
   (setq org-clock-idle-time 30)
 
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (org-roam-node-open
+               (org-roam-node-from-title-or-alias "journal"))))
+
+  (defun mike/org-roam-open-journal ()
+    "Open my Org-roam Journal node."
+    (interactive)
+    (org-roam-node-open
+     (org-roam-node-from-title-or-alias "journal")))
+
+
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.25))
   (setq org-startup-with-inline-images t)
   (setq projectile-project-search-path '("~/Code/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
@@ -846,8 +856,10 @@ before packages are loaded."
     "oi" 'org-roam-node-insert
     "of" 'org-roam-node-find
     "os" 'org-roam-db-sync
+    "ob" 'org-roam-buffer-toggle
     "od" 'org-roam-dailies-goto-today
     "ot" 'org-roam-dailies-goto-tomorrow
+    "oj" #'mike/org-roam-open-journal
     "oy" 'org-roam-dailies-goto-yesterday
     )
 
@@ -871,11 +883,13 @@ before packages are loaded."
   (setq org-export-with-broken-links t)
 
   ;; (add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
+  (setq org-babel-sh-shell "bash")
+
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '(
-     ;; (sh . t)
+     (shell . t)
      (python . t)
      (calc . t)
      ))
@@ -944,7 +958,409 @@ This function is called at the very end of Spacemacs initialization."
    '(markdown-fontify-code-blocks-natively t)
    '(org-agenda-block-separator 61)
    '(org-agenda-files
-     '("~/Documents/Org/" "~/Documents/Org/Notes.org" "~/Documents/Org/daily/"))
+     '("/home/mike/Documents/Org/20251028201323-the_scientific_method.org"
+       "/home/mike/Documents/Org/20251028202250-plasma.org"
+       "/home/mike/Documents/Org/20251028203908-atomic_theory.org"
+       "/home/mike/Documents/Org/20251028204048-democritus.org"
+       "/home/mike/Documents/Org/20251028204433-john_dalton.org"
+       "/home/mike/Documents/Org/20251028204650-atoms.org"
+       "/home/mike/Documents/Org/20251028204744-hantaro_nagaoka.org"
+       "/home/mike/Documents/Org/20251028204831-nucleus.org"
+       "/home/mike/Documents/Org/20251028204851-electrons.org"
+       "/home/mike/Documents/Org/20251028205219-ernest_rutherford.org"
+       "/home/mike/Documents/Org/20251028205249-cathode_ray_tube_experiment.org"
+       "/home/mike/Documents/Org/20251028210047-how_did_scientists_first_determine_molecular_structure.org"
+       "/home/mike/Documents/Org/20251028210405-what_order_do_we_write_elements_within_molecules_compounds.org"
+       "/home/mike/Documents/Org/20251028210441-what_s_the_benefit_of_empirical_formulas.org"
+       "/home/mike/Documents/Org/20251028213655-protons.org"
+       "/home/mike/Documents/Org/20251028213712-neutrons.org"
+       "/home/mike/Documents/Org/20251029054341-chemistry.org"
+       "/home/mike/Documents/Org/20251029054846-physics.org"
+       "/home/mike/Documents/Org/20251029055039-latex.org"
+       "/home/mike/Documents/Org/20251029055243-computer_science_degree.org"
+       "/home/mike/Documents/Org/20251029055409-academic_upgrading.org"
+       "/home/mike/Documents/Org/20251029055530-homework.org"
+       "/home/mike/Documents/Org/20251029060337-how_do_special_isomers_work.org"
+       "/home/mike/Documents/Org/20251029161614-chemical_bonding.org"
+       "/home/mike/Documents/Org/20251029161705-ionic_bonds.org"
+       "/home/mike/Documents/Org/20251029162245-ions.org"
+       "/home/mike/Documents/Org/20251029192122-why_do_electrons_use_subshell_4s_before_3d.org"
+       "/home/mike/Documents/Org/20251029192552-what_is_the_energy_source_that_electrons_need_to_transfer_to_another_atom.org"
+       "/home/mike/Documents/Org/20251029192656-when_were_subshell_orbitals_discovered.org"
+       "/home/mike/Documents/Org/20251029193050-is_group_13_interchangeable_with_group_3_on_the_periodic_table.org"
+       "/home/mike/Documents/Org/20251029193356-is_the_4d_subshell_part_of_the_fourth_or_fifth_shell_of_the_atom.org"
+       "/home/mike/Documents/Org/20251029193500-can_all_elements_form_a_chemical_bond.org"
+       "/home/mike/Documents/Org/20251029193717-what_do_covalent_bonds_actually_look_like.org"
+       "/home/mike/Documents/Org/20251029193906-were_the_single_letter_elements_named_first.org"
+       "/home/mike/Documents/Org/20251029194003-the_periodic_table.org"
+       "/home/mike/Documents/Org/20251029205640-matter.org"
+       "/home/mike/Documents/Org/20251029205828-elements.org"
+       "/home/mike/Documents/Org/20251029205912-how_did_they_first_determine_the_atomic_mass_of_elements.org"
+       "/home/mike/Documents/Org/20251029205954-atomic_mass.org"
+       "/home/mike/Documents/Org/20251029210203-how_did_dmitri_mendeleev_know_the_number_of_protons_for_each_element_in_the_periodic_table.org"
+       "/home/mike/Documents/Org/20251029210234-the_periodic_table.org"
+       "/home/mike/Documents/Org/20251029210546-what_are_artificial_elements.org"
+       "/home/mike/Documents/Org/20251029210905-scientic_laws_principles.org"
+       "/home/mike/Documents/Org/20251029211132-periodic_law_properties_of_elements_repeat_in_periodic_functions_of_their_atomic_number.org"
+       "/home/mike/Documents/Org/20251029211258-what_are_the_properties_of_the_different_groups_on_the_periodic_table.org"
+       "/home/mike/Documents/Org/20251029211416-how_are_these_groups_used_in_the_world.org"
+       "/home/mike/Documents/Org/20251029211709-john_dalton_s_atomic_theory.org"
+       "/home/mike/Documents/Org/20251029211820-law_of_multiple_proportions.org"
+       "/home/mike/Documents/Org/20251029212539-what_energy_does_matter_possess.org"
+       "/home/mike/Documents/Org/20251029212635-what_is_the_difinition_of_matter.org"
+       "/home/mike/Documents/Org/20251029212712-chemical_changes.org"
+       "/home/mike/Documents/Org/20251029212841-physical_changes.org"
+       "/home/mike/Documents/Org/20251029213037-physical_properties_of_elements.org"
+       "/home/mike/Documents/Org/20251029213258-chemical_properties.org"
+       "/home/mike/Documents/Org/20251029213508-classification_of_matter.org"
+       "/home/mike/Documents/Org/20251029213633-pure_substances.org"
+       "/home/mike/Documents/Org/20251029213644-mixtures.org"
+       "/home/mike/Documents/Org/20251029213829-chemistry_is_the_study_of_changes_in_matter_physical_and_chemical.org"
+       "/home/mike/Documents/Org/20251029213917-theories_say_why_laws_say_what.org"
+       "/home/mike/Documents/Org/20251029214100-how_long_does_it_take_for_copper_powder_and_oxygen_take_to_undergo_a_chemical_change.org"
+       "/home/mike/Documents/Org/20251029214258-why_do_molecules_elements_feel_the_need_to_compound_in_the_first_place_what_determines_weather_a_reaction_occurs_or_not.org"
+       "/home/mike/Documents/Org/20251029214449-law_of_conservation_of_mass.org"
+       "/home/mike/Documents/Org/20251029214707-law_of_definite_composition.org"
+       "/home/mike/Documents/Org/20251029215935-why_was_it_originally_hypothesized_that_atoms_had_a_positive_and_a_negative_charge.org"
+       "/home/mike/Documents/Org/20251029220507-millikan_s_oil_dropplets_experiment.org"
+       "/home/mike/Documents/Org/20251031220322-covalent_radii.org"
+       "/home/mike/Documents/Org/20251031221203-what_are_some_trends_seen_across_the_periodic_table.org"
+       "/home/mike/Documents/Org/20251031224853-naming_ionic_compounds.org"
+       "/home/mike/Documents/Org/20251031225305-cation.org"
+       "/home/mike/Documents/Org/20251031225334-anion.org"
+       "/home/mike/Documents/Org/20251031230410-valence_shell.org"
+       "/home/mike/Documents/Org/20251101103112-electronegativity.org"
+       "/home/mike/Documents/Org/20251101103208-valence_shell.org"
+       "/home/mike/Documents/Org/20251101103909-principle_energy_levels.org"
+       "/home/mike/Documents/Org/20251101104126-molecules.org"
+       "/home/mike/Documents/Org/20251101104542-compounds.org"
+       "/home/mike/Documents/Org/20251101104714-metallic_bonds.org"
+       "/home/mike/Documents/Org/20251101122823-what_is_the_inert_pair_effect.org"
+       "/home/mike/Documents/Org/20251101123037-orbitals.org"
+       "/home/mike/Documents/Org/20251101124514-electron_affinity.org"
+       "/home/mike/Documents/Org/20251101124832-gases.org"
+       "/home/mike/Documents/Org/20251101125259-ionization_energy.org"
+       "/home/mike/Documents/Org/20251101131342-oxidation_state.org"
+       "/home/mike/Documents/Org/20251101132233-what_is_the_shielding_effect.org"
+       "/home/mike/Documents/Org/20251101134923-electron_subshells.org"
+       "/home/mike/Documents/Org/20251101134953-hund_s_rule.org"
+       "/home/mike/Documents/Org/20251101135901-degenerate_subshells.org"
+       "/home/mike/Documents/Org/20251101151553-atomic_radii.org"
+       "/home/mike/Documents/Org/20251101153104-electron_shells.org"
+       "/home/mike/Documents/Org/20251101155115-transition_metals.org"
+       "/home/mike/Documents/Org/20251101155900-how_to_determine_an_elements_perpensity_to_form_a_positive_or_a_negative_ion.org"
+       "/home/mike/Documents/Org/20251101160213-naming_ionic_compounds_do_i_need_to_include_the_charge_of_my_ions_in_the_form_of_roman_numerals_within_parenthesis_i_e_ⅱ.org"
+       "/home/mike/Documents/Org/20251101185823-why_did_albert_einstein_call_galileo_galilei_the_father_of_modern_science.org"
+       "/home/mike/Documents/Org/20251101185842-galileo_galilei.org"
+       "/home/mike/Documents/Org/20251101185856-albert_einstein.org"
+       "/home/mike/Documents/Org/20251102095854-life.org"
+       "/home/mike/Documents/Org/20251102095948-ideas.org"
+       "/home/mike/Documents/Org/20251102100026-my_custom_designed_todo_list.org"
+       "/home/mike/Documents/Org/20251102103423-iupac_international_union_of_pure_and_applied_chemistry.org"
+       "/home/mike/Documents/Org/20251102111432-how_were_atoms_formed.org"
+       "/home/mike/Documents/Org/20251102173554-polyatomic_ions.org"
+       "/home/mike/Documents/Org/20251102173634-polyatomic_ionic_bonds.org"
+       "/home/mike/Documents/Org/20251103122956-what_s_the_benefit_of_a_stable_atom.org"
+       "/home/mike/Documents/Org/20251103124924-polar_substances.org"
+       "/home/mike/Documents/Org/20251103125059-characteristics_of_polar_substances.org"
+       "/home/mike/Documents/Org/20251103125156-polar_bonds.org"
+       "/home/mike/Documents/Org/20251103125356-electrolytes.org"
+       "/home/mike/Documents/Org/20251103130355-multi_valent_ions.org"
+       "/home/mike/Documents/Org/20251103130517-organic_compounds.org"
+       "/home/mike/Documents/Org/20251103130542-zinc.org"
+       "/home/mike/Documents/Org/20251103135731-why_does_zinc_shed_it_s_s_subshell_before_it_s_d_subshell.org"
+       "/home/mike/Documents/Org/20251103210024-projectile_motion.org"
+       "/home/mike/Documents/Org/20251103210049-greek_symbols.org"
+       "/home/mike/Documents/Org/20251103215058-projectiles.org"
+       "/home/mike/Documents/Org/20251103215123-gravity.org"
+       "/home/mike/Documents/Org/20251103215308-trajectory.org"
+       "/home/mike/Documents/Org/20251103215939-mass.org"
+       "/home/mike/Documents/Org/20251103220303-horizontal_motion.org"
+       "/home/mike/Documents/Org/20251103220331-uniform_motion.org"
+       "/home/mike/Documents/Org/20251104103946-shit_that_needs_to_get_done.org"
+       "/home/mike/Documents/Org/20251104104004-build_a_better_cat_litter_box_enclosure.org"
+       "/home/mike/Documents/Org/20251104104020-organize_all_of_my_fucking_cables.org"
+       "/home/mike/Documents/Org/20251104104054-figure_out_how_to_minimize_electronic_coil_whine_in_my_office_either_through_new_electronics_or_with_sound_dampening_enclosure.org"
+       "/home/mike/Documents/Org/20251104104130-emacs.org"
+       "/home/mike/Documents/Org/20251104104137-org_mode.org"
+       "/home/mike/Documents/Org/20251104104159-prettify_checkboxes.org"
+       "/home/mike/Documents/Org/20251104104258-implement_strikethrough_for_my_completed_task_items.org"
+       "/home/mike/Documents/Org/20251104105114-figure_out_how_to_make_source_blocks_look_nicer_more_like_doom_or_obsidian.org"
+       "/home/mike/Documents/Org/20251104105207-yassnippets_no_longer_tab_completes_needs_to_be_fixed.org"
+       "/home/mike/Documents/Org/20251104131358-describing_the_kinematics_formulas.org"
+       "/home/mike/Documents/Org/20251104131440-kinematics.org"
+       "/home/mike/Documents/Org/20251104174121-how_was_the_fractional_abundance_of_atoms_determined.org"
+       "/home/mike/Documents/Org/20251104175446-isotopes.org"
+       "/home/mike/Documents/Org/20251104175726-mass_spectrometer.org"
+       "/home/mike/Documents/Org/20251104180334-magnetic_field.org"
+       "/home/mike/Documents/Org/20251104180628-charge.org"
+       "/home/mike/Documents/Org/20251104180912-fractional_abundanc.org"
+       "/home/mike/Documents/Org/20251104201940-aristotle.org"
+       "/home/mike/Documents/Org/20251104202156-lucippus.org"
+       "/home/mike/Documents/Org/20251104203401-radioactivity.org"
+       "/home/mike/Documents/Org/20251104203804-j_j_thompson.org"
+       "/home/mike/Documents/Org/20251104204858-cathode_ray.org"
+       "/home/mike/Documents/Org/20251104205307-vacuum.org"
+       "/home/mike/Documents/Org/20251105221231-polar_covelant_bond.org"
+       "/home/mike/Documents/Org/20251105221844-linus_pauling.org"
+       "/home/mike/Documents/Org/20251105223119-pauling_scale.org"
+       "/home/mike/Documents/Org/20251106082608-effective_nuclear_charge.org"
+       "/home/mike/Documents/Org/20251106083730-electrostatic.org"
+       "/home/mike/Documents/Org/20251106110122-monatomic_ions.org"
+       "/home/mike/Documents/Org/20251106110855-carbon.org"
+       "/home/mike/Documents/Org/20251106110919-hydrogen.org"
+       "/home/mike/Documents/Org/20251106120333-photons.org"
+       "/home/mike/Documents/Org/20251106134057-sub_atomic.org"
+       "/home/mike/Documents/Org/20251106135229-atomic_mass_units.org"
+       "/home/mike/Documents/Org/20251108140308-electromagnetic_interferance.org"
+       "/home/mike/Documents/Org/20251108140359-set_up_my_3d_printer.org"
+       "/home/mike/Documents/Org/20251108142519-fix_big_brother_printer.org"
+       "/home/mike/Documents/Org/20251108143052-building_an_electrical_distribution_system_for_my_workshop.org"
+       "/home/mike/Documents/Org/20251108151920-add_drawer_liner_to_my_workshop_drawers.org"
+       "/home/mike/Documents/Org/20251109092156-3d_printing.org"
+       "/home/mike/Documents/Org/20251109142931-gridfinity.org"
+       "/home/mike/Documents/Org/20251110125202-garage.org"
+       "/home/mike/Documents/Org/20251110125259-home_organization.org"
+       "/home/mike/Documents/Org/20251110125608-work_van.org"
+       "/home/mike/Documents/Org/20251112140748-gases.org"
+       "/home/mike/Documents/Org/20251114165558-shit_to_get_done_before_i_return_to_work.org"
+       "/home/mike/Documents/Org/20251114170111-hyprland.org"
+       "/home/mike/Documents/Org/20251114171334-furnace_take_off_for_garage.org"
+       "/home/mike/Documents/Org/20251114180659-org_roam.org"
+       "/home/mike/Documents/Org/20251114182642-air_resistance.org"
+       "/home/mike/Documents/Org/20251114182926-vertical_motion.org"
+       "/home/mike/Documents/Org/20251114183708-sir_isaac_newton.org"
+       "/home/mike/Documents/Org/20251114183803-three_laws_of_motion.org"
+       "/home/mike/Documents/Org/20251114184813-ballistics.org"
+       "/home/mike/Documents/Org/20251114184915-parabola.org"
+       "/home/mike/Documents/Org/20251114185217-total_velocity.org"
+       "/home/mike/Documents/Org/20251114185259-resultant.org"
+       "/home/mike/Documents/Org/20251114195610-vector.org"
+       "/home/mike/Documents/Org/20251114195624-total_velocity.org"
+       "/home/mike/Documents/Org/20251114195642-velocity.org"
+       "/home/mike/Documents/Org/20251115112913-trigonometry.org"
+       "/home/mike/Documents/Org/20251116174444-lattice.org"
+       "/home/mike/Documents/Org/20251117142442-chemistry.org"
+       "/home/mike/Documents/Org/20251117143424-nuclear_physics.org"
+       "/home/mike/Documents/Org/20251117143820-micheal_faraday.org"
+       "/home/mike/Documents/Org/20251117144256-gold_foil_experiment.org"
+       "/home/mike/Documents/Org/20251117144500-alpha_particles.org"
+       "/home/mike/Documents/Org/20251117174347-compendium_of_chemical_terminology.org"
+       "/home/mike/Documents/Org/20251118215040-gifts.org"
+       "/home/mike/Documents/Org/20251118222915-org_agenda.org"
+       "/home/mike/Documents/Org/20251119152740-noble_gases.org"
+       "/home/mike/Documents/Org/20251119154059-empiral_formula.org"
+       "/home/mike/Documents/Org/20251119154154-molecular_formula.org"
+       "/home/mike/Documents/Org/20251119155612-lee_cronin_s_3d_printer_for_medications.org"
+       "/home/mike/Documents/Org/20251120130359-net_force.org"
+       "/home/mike/Documents/Org/20251120131704-law_of_acceleration.org"
+       "/home/mike/Documents/Org/20251121114947-note_taking.org"
+       "/home/mike/Documents/Org/20251121120905-significant_digits.org"
+       "/home/mike/Documents/Org/20251121121300-terms.org"
+       "/home/mike/Documents/Org/20251121121339-standard_units.org"
+       "/home/mike/Documents/Org/20251121122510-anatomy_of_an_answer.org"
+       "/home/mike/Documents/Org/20251121122754-how_do_you_mathematically_get_s_2.org"
+       "/home/mike/Documents/Org/20251121123912-commutative.org"
+       "/home/mike/Documents/Org/20251121124213-pre_course_knowledge_question_about_gravity.org"
+       "/home/mike/Documents/Org/20251121134416-friction.org"
+       "/home/mike/Documents/Org/20251122114856-isomers.org"
+       "/home/mike/Documents/Org/20251122115619-chemical_reaction.org"
+       "/home/mike/Documents/Org/20251122121046-spacial_isomers.org"
+       "/home/mike/Documents/Org/20251122121741-enantiomers.org"
+       "/home/mike/Documents/Org/20251122122156-superimpose.org"
+       "/home/mike/Documents/Org/20251122122514-moles.org"
+       "/home/mike/Documents/Org/20251122124212-avogradro_s_number.org"
+       "/home/mike/Documents/Org/20251122141246-macroscopic.org"
+       "/home/mike/Documents/Org/20251122141355-microscopic.org"
+       "/home/mike/Documents/Org/20251122143544-molar_mass.org"
+       "/home/mike/Documents/Org/20251122155543-molarity.org"
+       "/home/mike/Documents/Org/20251122155711-solute.org"
+       "/home/mike/Documents/Org/20251122155745-solvent.org"
+       "/home/mike/Documents/Org/20251122155935-solution.org"
+       "/home/mike/Documents/Org/20251122160334-homogeneous_mixture.org"
+       "/home/mike/Documents/Org/20251122161018-aqueous_solution.org"
+       "/home/mike/Documents/Org/20251122161109-concentration.org"
+       "/home/mike/Documents/Org/20251122161353-dilute.org"
+       "/home/mike/Documents/Org/20251122163519-factor_label_method.org"
+       "/home/mike/Documents/Org/20251123124604-solubility.org"
+       "/home/mike/Documents/Org/20251123124636-substance.org"
+       "/home/mike/Documents/Org/20251123124738-coefficient.org"
+       "/home/mike/Documents/Org/20251123124913-acid.org"
+       "/home/mike/Documents/Org/20251123125016-precipitate.org"
+       "/home/mike/Documents/Org/20251123125059-reactant.org"
+       "/home/mike/Documents/Org/20251123125225-product.org"
+       "/home/mike/Documents/Org/20251123132259-acid_base_reaction.org"
+       "/home/mike/Documents/Org/20251123132639-base.org"
+       "/home/mike/Documents/Org/20251123132754-stoichiometry.org"
+       "/home/mike/Documents/Org/20251123132838-strong_acid.org"
+       "/home/mike/Documents/Org/20251123132946-strong_base.org"
+       "/home/mike/Documents/Org/20251123133032-weak_acid.org"
+       "/home/mike/Documents/Org/20251123133139-weak_base.org"
+       "/home/mike/Documents/Org/20251123134952-salt.org"
+       "/home/mike/Documents/Org/20251123135247-saturated.org"
+       "/home/mike/Documents/Org/20251123142041-particle.org"
+       "/home/mike/Documents/Org/20251123142843-oxidation_reduction_reaction_redox.org"
+       "/home/mike/Documents/Org/20251123142932-oxidation.org"
+       "/home/mike/Documents/Org/20251123143024-reduction.org"
+       "/home/mike/Documents/Org/20251124132839-covalent_bond.org"
+       "/home/mike/Documents/Org/20251124133733-the_octet_rule.org"
+       "/home/mike/Documents/Org/20251124133935-maximum_number_of_electrons_per_shell.org"
+       "/home/mike/Documents/Org/20251124134224-average_atomic_mass.org"
+       "/home/mike/Documents/Org/20251124134519-how_did_scientists_accurately_assertain_elements_before_atomic_theory_was_properly_developed.org"
+       "/home/mike/Documents/Org/20251124134639-how_can_they_determine_the_ammount_of_electrons_surrounding_an_atom.org"
+       "/home/mike/Documents/Org/20251124134742-shape_of_the_periodic_table.org"
+       "/home/mike/Documents/Org/20251124135439-heat.org"
+       "/home/mike/Documents/Org/20251124135449-electricity.org"
+       "/home/mike/Documents/Org/20251124140510-bronze.org"
+       "/home/mike/Documents/Org/20251124140611-alloy.org"
+       "/home/mike/Documents/Org/20251125102121-emacs_calc.org"
+       "/home/mike/Documents/Org/20251125105213-python.org"
+       "/home/mike/Documents/Org/20251125105221-django.org"
+       "/home/mike/Documents/Org/20251125105248-javascript.org"
+       "/home/mike/Documents/Org/20251125110946-projects.org"
+       "/home/mike/Documents/Org/20251125111008-christmas_break_2025.org"
+       "/home/mike/Documents/Org/20251125111044-django.org"
+       "/home/mike/Documents/Org/20251125111307-mikesnotes.org"
+       "/home/mike/Documents/Org/20251125112057-adderall.org"
+       "/home/mike/Documents/Org/20251125135854-org_babel.org"
+       "/home/mike/Documents/Org/20251125145327-life.org"
+       "/home/mike/Documents/Org/20251125145543-top_floor.org"
+       "/home/mike/Documents/Org/20251125145647-main_floor.org"
+       "/home/mike/Documents/Org/20251125145730-places_to_organize.org"
+       "/home/mike/Documents/Org/20251125145901-pranks.org"
+       "/home/mike/Documents/Org/20251125150018-health.org"
+       "/home/mike/Documents/Org/20251125150210-books.org"
+       "/home/mike/Documents/Org/20251125150238-goals.org"
+       "/home/mike/Documents/Org/20251125150351-finances.org"
+       "/home/mike/Documents/Org/20251125150616-emacs_flashcards_plugin.org"
+       "/home/mike/Documents/Org/20251125150637-emacs_todo_display_device.org"
+       "/home/mike/Documents/Org/20251125150656-emacs_canvas_tool.org"
+       "/home/mike/Documents/Org/20251125150816-photography.org"
+       "/home/mike/Documents/Org/20251125150931-birds.org"
+       "/home/mike/Documents/Org/20251125151135-anxiety.org"
+       "/home/mike/Documents/Org/20251125151237-stuff_i_want.org"
+       "/home/mike/Documents/Org/20251125151351-stephen_hawking.org"
+       "/home/mike/Documents/Org/20251125151933-tech.org"
+       "/home/mike/Documents/Org/20251125152106-zealot.org"
+       "/home/mike/Documents/Org/20251125153446-school.org"
+       "/home/mike/Documents/Org/20251125154651-intermolecular_force.org"
+       "/home/mike/Documents/Org/20251125154841-deposition.org"
+       "/home/mike/Documents/Org/20251125155003-dipole_dipole_attraction.org"
+       "/home/mike/Documents/Org/20251125155041-dipoles.org"
+       "/home/mike/Documents/Org/20251125155145-hydrogen_bonding.org"
+       "/home/mike/Documents/Org/20251125155430-induced_dipole.org"
+       "/home/mike/Documents/Org/20251125161920-instantaneous_dipole.org"
+       "/home/mike/Documents/Org/20251125162414-static_friction_stiction.org"
+       "/home/mike/Documents/Org/20251125162740-van_der_waals.org"
+       "/home/mike/Documents/Org/20251125164845-why_is_static_friction_greater_than_kinetic_friction.org"
+       "/home/mike/Documents/Org/20251125165035-asperities.org"
+       "/home/mike/Documents/Org/20251125165213-adhesive_force.org"
+       "/home/mike/Documents/Org/20251125195646-dispersion_force.org"
+       "/home/mike/Documents/Org/20251125200214-cohesive_force.org"
+       "/home/mike/Documents/Org/20251125201856-kinetic_energy.org"
+       "/home/mike/Documents/Org/20251125202236-phase_of_matter.org"
+       "/home/mike/Documents/Org/20251125202444-condensate.org"
+       "/home/mike/Documents/Org/20251125202757-melting.org"
+       "/home/mike/Documents/Org/20251125202805-vaporization.org"
+       "/home/mike/Documents/Org/20251125203207-intramolecular_force.org"
+       "/home/mike/Documents/Org/20251126080230-thermal_energy.org"
+       "/home/mike/Documents/Org/20251126080354-temperature.org"
+       "/home/mike/Documents/Org/20251126080434-quantitative.org"
+       "/home/mike/Documents/Org/20251126080717-lattice_energy.org"
+       "/home/mike/Documents/Org/20251126080734-energy.org"
+       "/home/mike/Documents/Org/20251126080947-joule.org"
+       "/home/mike/Documents/Org/20251126081511-newton.org"
+       "/home/mike/Documents/Org/20251126082647-calorie.org"
+       "/home/mike/Documents/Org/20251126082758-water.org"
+       "/home/mike/Documents/Org/20251126083308-bond_energy_bond_disssociation_energy.org"
+       "/home/mike/Documents/Org/20251126083531-endothermic_process.org"
+       "/home/mike/Documents/Org/20251126083656-exothermic_process.org"
+       "/home/mike/Documents/Org/20251126083854-work.org"
+       "/home/mike/Documents/Org/20251126084006-pressure.org"
+       "/home/mike/Documents/Org/20251126084015-volume.org"
+       "/home/mike/Documents/Org/20251126084343-ideal_gas.org"
+       "/home/mike/Documents/Org/20251126084452-gas_laws.org"
+       "/home/mike/Documents/Org/20251126084538-ideal_gas_constant_r.org"
+       "/home/mike/Documents/Org/20251126084856-international_system_of_units.org"
+       "/home/mike/Documents/Org/20251126085617-atmosphere_atm.org"
+       "/home/mike/Documents/Org/20251126085735-ideal_gas_law.org"
+       "/home/mike/Documents/Org/20251126090118-solid.org"
+       "/home/mike/Documents/Org/20251126090419-kinetic_molecular_theory.org"
+       "/home/mike/Documents/Org/20251126090933-pascal.org"
+       "/home/mike/Documents/Org/20251126091303-boyle_s_law.org"
+       "/home/mike/Documents/Org/20251126091703-absolute_zero.org"
+       "/home/mike/Documents/Org/20251126091806-charles_s_law.org"
+       "/home/mike/Documents/Org/20251126092516-avogadro_s_law.org"
+       "/home/mike/Documents/Org/20251126095030-dipole_moment.org"
+       "/home/mike/Documents/Org/20251126095232-polarity.org"
+       "/home/mike/Documents/Org/20251126095743-double_bond.org"
+       "/home/mike/Documents/Org/20251126100601-molecular_structure.org"
+       "/home/mike/Documents/Org/20251126100752-nomenclature.org"
+       "/home/mike/Documents/Org/20251126101454-polar_molecule.org"
+       "/home/mike/Documents/Org/20251126101931-pure_covalent_bond.org"
+       "/home/mike/Documents/Org/20251126102433-valence_shell_electron_pair_repulsion_theory.org"
+       "/home/mike/Documents/Org/20251126102453-theory.org"
+       "/home/mike/Documents/Org/20251126102914-aufbau_principle.org"
+       "/home/mike/Documents/Org/20251126103151-core_electron.org"
+       "/home/mike/Documents/Org/20251126103204-electron.org"
+       "/home/mike/Documents/Org/20251126105409-angular_momentum_quantum_number.org"
+       "/home/mike/Documents/Org/20251126110509-dalton.org"
+       "/home/mike/Documents/Org/20251126110834-postulates.org"
+       "/home/mike/Documents/Org/20251126111251-hypothesis.org"
+       "/home/mike/Documents/Org/20251126112030-heterogeneous_mixture.org"
+       "/home/mike/Documents/Org/20251126112256-law.org"
+       "/home/mike/Documents/Org/20251126115254-liquid.org"
+       "/home/mike/Documents/Org/20251126120233-kelvin_k.org"
+       "/home/mike/Documents/Org/20251126141240-ph.org"
+       "/home/mike/Documents/Org/20251126141545-hydronium.org"
+       "/home/mike/Documents/Org/20251126141650-poh.org"
+       "/home/mike/Documents/Org/20251126141725-hydroxide.org"
+       "/home/mike/Documents/Org/20251126141856-acidic.org"
+       "/home/mike/Documents/Org/20251126142228-basic.org"
+       "/home/mike/Documents/Org/20251126143526-spontaneous_process.org"
+       "/home/mike/Documents/Org/20251126143704-dissociation.org"
+       "/home/mike/Documents/Org/20251126143757-dissolution.org"
+       "/home/mike/Documents/Org/20251126143818-ionic_compound.org"
+       "/home/mike/Documents/Org/20251126144134-polarizability.org"
+       "/home/mike/Documents/Org/20251126144251-entropy.org"
+       "/home/mike/Documents/Org/20251126145019-dissolution.org"
+       "/home/mike/Documents/Org/20251126145034-diffusion.org"
+       "/home/mike/Documents/Org/20251126155815-periodic_law.org"
+       "/home/mike/Documents/Org/20251126180138-diatomic_molecules.org"
+       "/home/mike/Documents/Org/20251126190352-.org"
+       "/home/mike/Documents/Org/20251127114520-productivity.org"
+       "/home/mike/Documents/Org/20251127120318-logarithms.org"
+       "/home/mike/Documents/Org/20251127132602-mnemonic.org"
+       "/home/mike/Documents/Org/20251127144308-pythagorean_therum.org"
+       "/home/mike/Documents/Org/20251127150603-archwiki.org"
+       "/home/mike/Documents/Org/20251127150648-don_t_repeat_yourself_principle.org"
+       "/home/mike/Documents/Org/20251127154542-art.org"
+       "/home/mike/Documents/Org/20251127154638-kanagawa_wave.org"
+       "/home/mike/Documents/Org/20251127154714-vincent_van_gogh.org"
+       "/home/mike/Documents/Org/20251127154914-casettefuturism.org"
+       "/home/mike/Documents/Org/20251127154957-cyberpunk.org"
+       "/home/mike/Documents/Org/20251128174904-fountain_pens.org"
+       "/home/mike/Documents/Org/20251206091245-self_hosting.org"
+       "/home/mike/Documents/Org/20251206091823-software_reccomendations_for_irfaan.org"
+       "/home/mike/Documents/Org/Braidy's-Budget.org"
+       "/home/mike/Documents/Org/Emacs org tutorial.org"
+       "/home/mike/Documents/Org/Life.org" "/home/mike/Documents/Org/journal.org"
+       "/home/mike/Documents/Org/daily/2025-11-01.org"
+       "/home/mike/Documents/Org/daily/2025-11-02.org"
+       "/home/mike/Documents/Org/daily/2025-11-04.org"
+       "/home/mike/Documents/Org/daily/2025-11-09.org"
+       "/home/mike/Documents/Org/daily/2025-11-10.org"
+       "/home/mike/Documents/Org/daily/2025-11-14.org"
+       "/home/mike/Documents/Org/daily/2025-11-17.org"
+       "/home/mike/Documents/Org/daily/2025-11-18.org"
+       "/home/mike/Documents/Org/daily/2025-11-19.org"
+       "/home/mike/Documents/Org/daily/2025-11-22.org"
+       "/home/mike/Documents/Org/daily/2025-11-24.org"
+       "/home/mike/Documents/Org/daily/2025-11-25.org"
+       "/home/mike/Documents/Org/daily/2025-11-26.org"
+       "/home/mike/Documents/Org/daily/2025-11-27.org"
+       "/home/mike/Documents/Org/daily/2025-11-28.org"
+       "/home/mike/Documents/Org/daily/2025-12-06.org"))
    '(org-link-translation-function 'toc-org-unhrefify)
    '(org-num-face nil)
    '(org-pretty-entities nil)
@@ -1047,12 +1463,14 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(default ((t (:background nil))))
-   '(org-checkbox ((t (:foreground "#FFFFEF" :box (:line-width (1 . 1) :style released-button)))))
+   '(org-checkbox ((t (:background nil))))
+   '(org-code ((t (:inherit shadow :foreground "#9b9b7a"))))
    '(org-level-1 ((t nil)))
    '(org-level-2 ((t nil)))
    '(org-level-3 ((t nil)))
    '(org-level-4 ((t nil)))
    '(org-level-5 ((t nil)))
    '(org-level-7 ((t nil)))
-   '(org-level-8 ((t nil))))
+   '(org-level-8 ((t nil)))
+   '(org-verbatim ((t (:inherit shadow :foreground "#d9ae94")))))
   )
