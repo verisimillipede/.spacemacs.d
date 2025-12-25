@@ -77,6 +77,7 @@ This function should only modify configuration layer settings."
     ranger
     neotree
     xkcd
+    theming
 
     (org :variables
          ;; org-enable-modern-support t
@@ -1462,8 +1463,8 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(default ((t (:background nil))))
-   '(org-checkbox ((t (:background nil))))
-   '(org-code ((t (:inherit shadow :foreground "#9b9b7a"))))
+   '(org-checkbox ((t (:background "#00000000" :box nil))))
+   '(org-code ((t (:inherit shadow :foreground "thistle"))))
    '(org-level-1 ((t nil)))
    '(org-level-2 ((t nil)))
    '(org-level-3 ((t nil)))
@@ -1471,5 +1472,5 @@ This function is called at the very end of Spacemacs initialization."
    '(org-level-5 ((t nil)))
    '(org-level-7 ((t nil)))
    '(org-level-8 ((t nil)))
-   '(org-verbatim ((t (:inherit shadow :foreground "#d9ae94")))))
+   '(org-verbatim ((t (:inherit shadow :foreground "LightBlue1")))))
   )
