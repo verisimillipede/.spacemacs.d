@@ -54,7 +54,7 @@ This function should only modify configuration layer settings."
     themes-megapack
     shell
     (latex :variables latex-backend 'lsp)
-    ;; pdf
+    pdf
     ;; spacemacs-org
 
     git
@@ -63,7 +63,6 @@ This function should only modify configuration layer settings."
     markdown
     multiple-cursors
     pandoc
-    pdf
     lsp
     (python :variables
             python-backend 'lsp
@@ -644,6 +643,7 @@ before packages are loaded."
   (add-hook 'org-mode-hook #'visual-line-mode)
 
   (require 'nerd-icons)
+  ;; ('compat)
 
 
   (use-package org-fragtog
@@ -672,18 +672,34 @@ before packages are loaded."
   ;; Enable automatic pairing of delimiters
   (electric-pair-mode 1)
 
+
+  ;; (modify-char-table char-width-table
+  ;;                    #xF4A7 2)
+  (defun my-nerd-icons-double-width ()
+    "Force all Nerd Font icons (PUA U+F000\u2013U+F8FF) to be treated as double-width in Emacs."
+    (interactive)
+    (let ((start #xF000)
+          (end   #xF8FF))
+      (dotimes (i (1+ (- end start)))
+        (set-char-table-range char-width-table (+ start i) 2))))
+
+
+  ;; (setq latex-view-pdf-in-split-window t)
+  (setq pdf-sync-backward-display-action t)
+  (setq pdf-sync-forward-display-action t)
   (defun my/prettify-symbols-setup ()
     ;; checkboxes
     (push '("[ ]" . "") prettify-symbols-alist)
     (push '("[X]" . "") prettify-symbols-alist)
     (push '("[-]" . "󱋭" ) prettify-symbols-alist)
 
-    ;; org-abel
+    ;; org-babel  (insert (nerd-icons-octicon "nf-oct-checkbox"))
     (push '("#+begin_src" . ?\u226b) prettify-symbols-alist)
     (push '("#+end_src" . ?\u226b) prettify-symbols-alist)
 
     (push '("#+begin_quote" . ?\u275d) prettify-symbols-alist)
     (push '("#+end_quote" . ?\u275e) prettify-symbols-alist)
+
 
     ;; drawers
     (push '(":properties:" . "\ueb52") prettify-symbols-alist)
@@ -843,7 +859,7 @@ before packages are loaded."
      (org-roam-node-from-title-or-alias "journal")))
 
 
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.25))
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1))
   (setq org-startup-with-inline-images t)
   (setq projectile-project-search-path '("~/Code/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
   (spacemacs/set-leader-keys
@@ -857,10 +873,7 @@ before packages are loaded."
     "of" 'org-roam-node-find
     "os" 'org-roam-db-sync
     "ob" 'org-roam-buffer-toggle
-    "od" 'org-roam-dailies-goto-today
-    "ot" 'org-roam-dailies-goto-tomorrow
     "oj" #'mike/org-roam-open-journal
-    "oy" 'org-roam-dailies-goto-yesterday
     )
 
   (use-package ligature
@@ -868,7 +881,7 @@ before packages are loaded."
     (ligature-set-ligatures 'org-mode '("--" "---" "==" "===" "!=" "!==" "=!="
                                         "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
                                         "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
-                                        "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
+                                        "<<" ">>" "||"  "_|_"  "||-" "|=" "||=" "##" "###" "####"
                                         "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
                                         "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
                                         "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
@@ -878,6 +891,7 @@ before packages are loaded."
                                         "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
                                         ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
                                         "<:<" ";;;"))
+    ;; removed ligatures "|-" "-|"
     (global-ligature-mode t))
 
   (setq org-export-with-broken-links t)
@@ -892,7 +906,22 @@ before packages are loaded."
      (shell . t)
      (python . t)
      (calc . t)
+     (gnuplot . t)
      ))
+
+  ;; (defun toggle-checkbox()
+  ;;   )
+  (defun consult-info-emacs ()
+    "Search through Emacs info pages."
+    (interactive)
+    (consult-info "emacs" "efaq" "elisp" "cl" "compat"))
+
+  (defun ap/helm-info-emacs-elisp-cl ()
+    "Helm for Emacs, Elisp, and CL-library info pages."
+    (interactive)
+    (helm :sources '(helm-source-info-emacs
+                     helm-source-info-elisp
+                     helm-source-info-cl)))
   )
 
 
@@ -1463,7 +1492,7 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(default ((t (:background nil))))
-   '(org-checkbox ((t (:background "#00000000" :box nil))))
+   '(org-checkbox ((t (:foreground "#9FC59F" :background "#00000000" :box nil))))
    '(org-code ((t (:inherit shadow :foreground "thistle"))))
    '(org-level-1 ((t nil)))
    '(org-level-2 ((t nil)))
@@ -1472,5 +1501,7 @@ This function is called at the very end of Spacemacs initialization."
    '(org-level-5 ((t nil)))
    '(org-level-7 ((t nil)))
    '(org-level-8 ((t nil)))
+   '(org-superstar-item ((t (:inherit default :foreground "goldenrod"))))
+   '(org-superstar-ordered-item ((t (:inherit default :foreground "goldenrod"))))
    '(org-verbatim ((t (:inherit shadow :foreground "LightBlue1")))))
   )
