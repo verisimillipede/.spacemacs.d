@@ -34,6 +34,7 @@ This function should only modify configuration layer settings."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers '
    (lua
+    notmuch
     yaml
     html
     python
@@ -50,7 +51,6 @@ This function should only modify configuration layer settings."
     better-defaults
     emacs-lisp
     nixos
-    compleseus
     themes-megapack
     shell
     (latex :variables latex-backend 'lsp)
@@ -109,13 +109,15 @@ This function should only modify configuration layer settings."
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages '
    (simpleclip
+    org-auctex
+    org-elp
     uniline
     zotero
     org-download
     nerd-icons
     zotra
     org-fragtog
-    org-latex-impatient
+    ;; org-latex-impatient
     djangonaut
     web-mode
     yasnippet-snippets
@@ -648,14 +650,14 @@ before packages are loaded."
 
   (use-package org-fragtog
     :hook (org-mode . org-fragtog-mode))
-  (use-package org-latex-impatient
-    :defer t
-    :hook (org-mode . org-latex-impatient-mode)
-    :init
-    (setq org-latex-impatient-tex2svg-bin
-          ;; location of tex2svg executable
-          "/etc/profiles/per-user/mike/bin/tex2svg")
-    (setq org-latex-impatient-scale 1.0))
+  ;; (use-package org-latex-impatient
+  ;;   :defer t
+  ;;   :hook (org-mode . org-latex-impatient-mode)
+  ;;   :init
+  ;; (setq org-latex-impatient-tex2svg-bin
+  ;;       ;; location of tex2svg executable
+  ;;       "/etc/profiles/per-user/mike/bin/tex2svg")
+  ;; (setq org-latex-impatient-scale 1.0))
   (use-package
     direnv
     :ensure t
@@ -724,6 +726,7 @@ before packages are loaded."
   ;; (setq font-use-system-font t)
 
   (setq org-grapher-notes-directory "~/Documents/Org/")
+  (add-hook 'org-mode-hook        #'spacemacs/toggle-centered-buffer)
 
   (setq select-enable-clipboard nil)
   (setq simpleclip-unmark-on-copy t)
@@ -861,7 +864,7 @@ before packages are loaded."
 
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 1))
   (setq org-startup-with-inline-images t)
-  (setq projectile-project-search-path '("~/Code/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
+  (setq projectile-project-search-path '("~/Code/", "~/nixcfg/", "~/Documents/Zettlekasten/", "~/.config/nvim/"))
   (spacemacs/set-leader-keys
     "oc" 'org-capture
     "oa" 'org-agenda
@@ -1009,7 +1012,6 @@ This function is called at the very end of Spacemacs initialization."
        "/home/mike/Documents/Org/20251029055243-computer_science_degree.org"
        "/home/mike/Documents/Org/20251029055409-academic_upgrading.org"
        "/home/mike/Documents/Org/20251029055530-homework.org"
-       "/home/mike/Documents/Org/20251029060337-how_do_special_isomers_work.org"
        "/home/mike/Documents/Org/20251029161614-chemical_bonding.org"
        "/home/mike/Documents/Org/20251029161705-ionic_bonds.org"
        "/home/mike/Documents/Org/20251029162245-ions.org"
@@ -1407,38 +1409,39 @@ This function is called at the very end of Spacemacs initialization."
                           color-theme-sanityinc-tomorrow column-enforce-mode
                           company-auctex company-lua company-math
                           company-nixos-options company-reftex company-web
-                          consult-lsp csv-mode cyberpunk-theme cython-mode
-                          dakrone-theme dap-mode darkmine-theme darkokai-theme
-                          darktooth-theme define-word devdocs diminish
-                          dired-quick-sort direnv disable-mouse django-theme
-                          djangonaut doom-themes dotenv-mode dracula-theme
-                          drag-stuff dumb-jump eat edit-indirect ef-themes
-                          elisp-def elisp-demos elisp-slime-nav emmet-mode emr
-                          espresso-theme eval-sexp-fu evil-anzu evil-args
-                          evil-cleverparens evil-collection evil-easymotion
-                          evil-escape evil-evilified-state evil-exchange
-                          evil-goggles evil-iedit-state evil-indent-plus evil-lion
-                          evil-numbers evil-org evil-surround evil-tex
-                          evil-textobj-line evil-tutor evil-unimpaired
-                          evil-visual-mark-mode evil-visualstar exotica-theme
-                          expand-region eyebrowse eziam-themes fancy-battery
-                          farmhouse-themes fira-code-mode flatland-theme
-                          flatui-theme flycheck-elsa flycheck-package
-                          flycheck-pos-tip flyspell-correct-helm gandalf-theme
-                          ggtags gh-md git-link git-messenger git-modes
-                          git-timemachine gitignore-templates gnuplot golden-ratio
-                          google-translate gotham-theme grandshell-theme
-                          gruber-darker-theme gruvbox-theme hc-zenburn-theme
-                          helm-ag helm-c-yasnippet helm-comint helm-company
-                          helm-css-scss helm-descbinds helm-git-grep helm-ls-git
-                          helm-lsp helm-make helm-mode-manager helm-nixos-options
-                          helm-org helm-org-rifle helm-projectile helm-purpose
-                          helm-pydoc helm-swoop helm-themes helm-xref hemisu-theme
-                          heroku-theme hide-comnt highlight-indentation
-                          highlight-numbers highlight-parentheses hl-todo
-                          holy-mode hungry-delete hybrid-mode impatient-mode
-                          indent-guide info+ inkpot-theme inspector ir-black-theme
-                          jazz-theme jbeans-theme js-doc js2-refactor json-mode
+                          consult-lsp consult-notmuch csv-mode cyberpunk-theme
+                          cython-mode dakrone-theme dap-mode darkmine-theme
+                          darkokai-theme darktooth-theme define-word devdocs
+                          diminish dired-quick-sort direnv disable-mouse
+                          django-theme djangonaut doom-themes dotenv-mode
+                          dracula-theme drag-stuff dumb-jump eat edit-indirect
+                          ef-themes elisp-def elisp-demos elisp-slime-nav
+                          emmet-mode emr espresso-theme eval-sexp-fu evil-anzu
+                          evil-args evil-cleverparens evil-collection
+                          evil-easymotion evil-escape evil-evilified-state
+                          evil-exchange evil-goggles evil-iedit-state
+                          evil-indent-plus evil-lion evil-numbers evil-org
+                          evil-surround evil-tex evil-textobj-line evil-tutor
+                          evil-unimpaired evil-visual-mark-mode evil-visualstar
+                          exotica-theme expand-region eyebrowse eziam-themes
+                          fancy-battery farmhouse-themes fira-code-mode
+                          flatland-theme flatui-theme flycheck-elsa
+                          flycheck-package flycheck-pos-tip flyspell-correct-helm
+                          gandalf-theme ggtags gh-md git-link git-messenger
+                          git-modes git-timemachine gitignore-templates gnuplot
+                          golden-ratio google-translate gotham-theme
+                          grandshell-theme gruber-darker-theme gruvbox-theme
+                          hc-zenburn-theme helm-ag helm-c-yasnippet helm-comint
+                          helm-company helm-css-scss helm-descbinds helm-git-grep
+                          helm-ls-git helm-lsp helm-make helm-mode-manager
+                          helm-nixos-options helm-notmuch helm-org helm-org-rifle
+                          helm-projectile helm-purpose helm-pydoc helm-swoop
+                          helm-themes helm-xref hemisu-theme heroku-theme
+                          hide-comnt highlight-indentation highlight-numbers
+                          highlight-parentheses hl-todo holy-mode hungry-delete
+                          hybrid-mode impatient-mode indent-guide info+
+                          inkpot-theme inspector ir-black-theme jazz-theme
+                          jbeans-theme js-doc js2-refactor json-mode
                           json-navigator json-reformat kaolin-themes ligature
                           light-soap-theme link-hint live-py-mode livid-mode
                           lorem-ipsum lsp-latex lsp-mode lsp-origami lsp-pyright
@@ -1447,15 +1450,16 @@ This function is called at the very end of Spacemacs initialization."
                           math-symbol-lists minimal-theme modus-themes moe-theme
                           molokai-theme monochrome-theme monokai-theme multi-line
                           mustang-theme mwim nameless names naquadah-theme
-                          nerd-icons nix-mode noctilux-theme nodejs-repl npm-mode
-                          oauth obsidian-theme occidental-theme oldlace-theme
-                          omtose-phellack-themes open-junk-file org-cliplink
-                          org-contrib org-download org-fragtog org-journal
-                          org-latex-impatient org-mime org-modern org-noter
-                          org-pomodoro org-present org-projectile org-rich-yank
-                          org-roam org-roam-ui org-super-agenda org-superstar
-                          org-transclusion organic-green-theme orgit-forge origami
-                          overseer ox-pandoc page-break-lines pandoc-mode paradox
+                          nerd-icons nix-mode noctilux-theme nodejs-repl notmuch
+                          npm-mode oauth obsidian-theme occidental-theme
+                          ol-notmuch oldlace-theme omtose-phellack-themes
+                          open-junk-file org-cliplink org-contrib org-download
+                          org-elp org-fragtog org-journal org-latex-impatient
+                          org-mime org-modern org-noter org-pomodoro org-present
+                          org-projectile org-rich-yank org-roam org-roam-ui
+                          org-super-agenda org-superstar org-transclusion
+                          organic-green-theme orgit-forge origami overseer
+                          ox-pandoc page-break-lines pandoc-mode paradox
                           password-generator pcre2el pdf-continuous-scroll-mode
                           pdf-tools pdf-view-restore pet phoenix-dark-mono-theme
                           phoenix-dark-pink-theme pip-requirements pipenv pippel
@@ -1492,7 +1496,7 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(default ((t (:background nil))))
-   '(org-checkbox ((t (:foreground "#9FC59F" :background "#00000000" :box nil))))
+   '(org-checkbox ((t (:foreground "#9FC59F" :background unspecified :box nil))))
    '(org-code ((t (:inherit shadow :foreground "thistle"))))
    '(org-level-1 ((t nil)))
    '(org-level-2 ((t nil)))
