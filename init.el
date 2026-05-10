@@ -8,7 +8,7 @@ This function should only modify configuration layer settings."
   (setq-default
 
    ;; Base distribution to use. This is a layer contained in the directory
-   ;; `+distribution'. For now available distributions are `spacemacs-base'
+   ;; `+distribution'. For now available dsistributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
 
@@ -53,6 +53,7 @@ This function should only modify configuration layer settings."
     nixos
     themes-megapack
     shell
+    org-noter
     (latex :variables latex-backend 'lsp)
     pdf
     ;; spacemacs-org
